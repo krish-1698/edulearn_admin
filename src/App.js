@@ -1,25 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import React,{useState} from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Login from "../src/pages/Login/Login"; // Adjust the import path to match your project structure
+import Register from "../src/pages/Register"; 
+import Dashboard from "./pages/Dashboard/Dashboard";
 
-function App() {
+
+const App = () => {
+
+  const [userType, setUserType] = useState("admin")
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div>
+        <Routes>
+          <Route path="/" element={<Login/>} />
+          <Route path="/register" element={<Register/>} />
+          <Route path="/dashboard" element={<Dashboard userType={userType} />}  />
+          {/* Add more routes for other components/pages */}
+        </Routes>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
