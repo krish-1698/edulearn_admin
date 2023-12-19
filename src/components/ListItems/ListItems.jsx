@@ -113,7 +113,7 @@ export const secondaryListItems = (
       {
         name: "Log out",
         icon: <Logout />,
-        link: "/login",
+        link: "/",
       },
     ].map((item) => (
       <Link to={item.link} style={{ textDecoration: "none", color: "black" }}>

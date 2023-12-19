@@ -76,7 +76,7 @@ function SidebarContent({ titleHeading, mainComp, userType }) {
   // const [userType2, setUserType] = React.useState("lecturer");
 
   useEffect(() => {
-    localStorage.setItem("userType", userType);
+    // localStorage.setItem("userType", userType);
     console.log(userType);
     console.log(" nkkx");
     
@@ -150,8 +150,8 @@ function SidebarContent({ titleHeading, mainComp, userType }) {
           <Divider />
           <List component="nav" >
           {/* { true && lecturerListItems} */}
-            {(userType || localStorage.getItem("userType")) === "admin" && adminListItems}
-            {(userType || localStorage.getItem("userType")) === "teacher" && teacherListItems}
+            {(localStorage.getItem("userType")) === "Admin" && adminListItems}
+            {(localStorage.getItem("userType")) === "Teacher" && teacherListItems}
             <Divider sx={{ my: 1 }} />
             {secondaryListItems}
           </List>

@@ -60,7 +60,7 @@ function CourseModal({ open, setOpen, courseToEdit }) {
         formData.append("hours", hours);
        
         axios
-            .post("http://localhost:3001/api/editUser", {
+            .post("http://localhost:3001/api/editCourse", {
                 data: formData
             })
             .then((res) => {

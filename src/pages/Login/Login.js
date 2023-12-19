@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Container, Paper, Typography, TextField, Button } from "@mui/material/";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
+  let navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -11,6 +13,24 @@ const Login = () => {
     e.preventDefault();
     // Handle form submission here, e.g., send email and password to the server
     // You can perform validation and make API requests here
+    axios
+    .get(`http://localhost:3001/api/user/${email}/${password}`)
+    .then((res) => {
+      // setCourses(res.data);
+      // setCourses(res.data);
+      console.log(res.data.length); 
+      if(res.data.length == 1){
+        navigate("/dashboard", { replace: true });
+        console.log(res.data[0].role);
+        localStorage.setItem("userType",res.data[0].role);
+      }
+      else{
+        alert("Invalid login");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
     console.log("Email:", email);
     console.log("Password:", password);
   };

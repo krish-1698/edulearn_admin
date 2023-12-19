@@ -10,7 +10,8 @@ import Courses from "./pages/Courses/courses";
 
 const App = () => {
 
-  const [userType, setUserType] = useState("admin")
+  const [userType, setUserType] = useState("Admin")
+  // setUserType(localStorage.getItem(userType));
   return (
     <Router>
       <div>
