@@ -12,8 +12,9 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { lecturerListItems, secondaryListItems, studentListItems } from '../../components/ListItems/ListItems';
+import { teacherListItems, secondaryListItems, adminListItems } from '../../components/ListItems/ListItems';
 import { Container, Grid } from '@mui/material';
+import logo from '../../assets/logo.png'
 // import Notification from '../../components/Notification/Notification';
 
 const drawerWidth = 240;
@@ -76,7 +77,8 @@ function SidebarContent({ titleHeading, mainComp, userType }) {
 
   useEffect(() => {
     localStorage.setItem("userType", userType);
-
+    console.log(userType);
+    console.log(" nkkx");
     
   //   var userType1 = localStorage.getItem("userType");
   //  setUserType();
@@ -90,11 +92,12 @@ function SidebarContent({ titleHeading, mainComp, userType }) {
 // }
 
 
+
   return (
     <ThemeProvider theme={mdTheme}>
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex'}}>
         <CssBaseline />
-        <AppBar position="absolute" open={open}>
+        <AppBar position="absolute" open={open} >
           <Toolbar
             sx={{
               pr: '24px', // keep right padding when drawer closed
@@ -130,24 +133,25 @@ function SidebarContent({ titleHeading, mainComp, userType }) {
         </AppBar>
 
 
-        <Drawer variant="permanent" open={open}>
+        <Drawer variant="permanent" open={open} >
           <Toolbar
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'flex-end',
-              px: [1],
+              px: [1]
             }}
           >
+            <img src={logo} alt="Your Logo" style={{ maxWidth: 130, marginRight:50 }} />
             <IconButton onClick={toggleDrawer}>
               <ChevronLeftIcon />
             </IconButton>
           </Toolbar>
           <Divider />
-          <List component="nav">
+          <List component="nav" >
           {/* { true && lecturerListItems} */}
-            {(userType || localStorage.getItem("userType")) === "admin" && studentListItems}
-            {(userType || localStorage.getItem("userType")) === "lecturer" && lecturerListItems}
+            {(userType || localStorage.getItem("userType")) === "admin" && adminListItems}
+            {(userType || localStorage.getItem("userType")) === "teacher" && teacherListItems}
             <Divider sx={{ my: 1 }} />
             {secondaryListItems}
           </List>

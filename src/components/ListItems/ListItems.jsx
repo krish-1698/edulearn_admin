@@ -8,6 +8,11 @@ import {
   Person3,
   Person,
   Topic,
+  Groups,
+  Image,
+  AutoStories,
+  Assessment,
+  ReportProblem
 } from "@mui/icons-material";
 import NavBarItem from "../../components/NavBarItem/NavBarItem";
 import { Link } from "react-router-dom";
@@ -20,7 +25,8 @@ function AllCoursesDataFetching() {
 
 
 
-export const studentListItems = (
+export const adminListItems = (
+
   <React.Fragment>
     {[
       {
@@ -30,24 +36,44 @@ export const studentListItems = (
       },
 
       {
-        name: "Courses",
-        icon: <BookmarkAdded />,
-        link: "/enrollments",
+        name: "Students",
+        icon: <Groups/>,
+        link: "/students",
       },
       {
         name: "Teachers",
         icon: <Person />,
-        link: "/grades",
+        link: "/teachers",
+      },
+      {
+        name: "Courses",
+        icon: <AutoStories />,
+        link: "/courses",
+      },
+      {
+        name: "Advertisements",
+        icon: <Image />,
+        link: "/advertisements",
+      },
+      {
+        name: "Reports",
+        icon: <Assessment />,
+        link: "/reports",
+      },
+      {
+        name: "Q & A Reports",
+        icon: <ReportProblem />,
+        link: "/qaReports",
       },
     ].map((item) => (
-      <Link to={item.link} style={{ textDecoration: "none", color: "black" }}>
+      <Link to={item.link} style={{ textDecoration: "none", color: "black"}}>
         <NavBarItem title={item.name} icon={item.icon} />
       </Link>
     ))}
   </React.Fragment>
-);
-
-export const lecturerListItems = (
+  );
+  
+export const teacherListItems = (
   <React.Fragment>
     {[
       {
@@ -57,9 +83,9 @@ export const lecturerListItems = (
       },
 
       {
-        name: "Courses",
+        name: "Students",
         icon: <BookmarkAdded />,
-        link: "/enrollments",
+        link: "/students",
       },
       // {
       //   name: "Sub Topic",
@@ -70,7 +96,7 @@ export const lecturerListItems = (
       {
         name: "Teachers",
         icon: <Person3 />,
-        link: "/enrollments",
+        link: "/teachers",
       }
 
     ].map((item) => (

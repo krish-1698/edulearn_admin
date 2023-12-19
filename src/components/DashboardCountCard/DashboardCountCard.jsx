@@ -73,7 +73,7 @@ function DashboardCountCard({coursesCount}) {
                             No. of Teachers
                         </Typography>
                         <Typography  variant="h4" component="div" align='center' fontWeight= "bold" >
-                            {lecturer}
+                            {lecturer}10
                         </Typography>
                     </CardContent>
                 </CardActionArea>
