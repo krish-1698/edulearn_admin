@@ -22,7 +22,10 @@ function AllCoursesDataFetching() {
 
 }
 
-
+const handleLogout = () => {
+  // Perform logout actions, such as clearing localStorage
+  localStorage.clear();
+};
 
 
 export const adminListItems = (
@@ -56,15 +59,25 @@ export const adminListItems = (
         link: "/advertisements",
       },
       {
-        name: "Reports",
-        icon: <Assessment />,
-        link: "/reports",
+        name: "Enrolments",
+        icon: <AutoStories />,
+        link: "/enrolments",
       },
       {
-        name: "Q & A Reports",
-        icon: <ReportProblem />,
-        link: "/qaReports",
+        name: "Groups",
+        icon: <AutoStories />,
+        link: "/groups",
       },
+      // {
+      //   name: "Reports",
+      //   icon: <Assessment />,
+      //   link: "/reports",
+      // },
+      // {
+      //   name: "Q & A Reports",
+      //   icon: <ReportProblem />,
+      //   link: "/qaReports",
+      // },
     ].map((item) => (
       <Link to={item.link} style={{ textDecoration: "none", color: "black"}}>
         <NavBarItem title={item.name} icon={item.icon} />
@@ -79,13 +92,13 @@ export const teacherListItems = (
       {
         name: "Dashboard",
         icon: <Dashboard />,
-        link: "/",
+        link: "/dashboard",
       },
 
       {
-        name: "Students",
-        icon: <BookmarkAdded />,
-        link: "/students",
+        name: "Courses",
+        icon: <AutoStories />,
+        link: "/courses",
       },
       // {
       //   name: "Sub Topic",
@@ -93,11 +106,16 @@ export const teacherListItems = (
       //   link: "/enrollments",
       // },
 
+      // {
+      //   name: "Teachers",
+      //   icon: <Person3 />,
+      //   link: "/teachers",
+      // },
       {
-        name: "Teachers",
-        icon: <Person3 />,
-        link: "/teachers",
-      }
+        name: "Enrolments",
+        icon: <AutoStories />,
+        link: "/enrolments",
+      },
 
     ].map((item) => (
       <Link to={item.link} style={{ textDecoration: "none", color: "black" }}>
@@ -116,7 +134,7 @@ export const secondaryListItems = (
         link: "/",
       },
     ].map((item) => (
-      <Link to={item.link} style={{ textDecoration: "none", color: "black" }}>
+      <Link to={item.link} style={{ textDecoration: "none", color: "black" }} onClick={handleLogout}>
       <NavBarItem title={item.name} icon={item.icon} />
       </Link>
     ))}

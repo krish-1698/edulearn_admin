@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import TablePagination from "@mui/material/TablePagination";
 import CreateStudentModal from "../../modal/createstudentModal";
 import StudentModal from "../../modal/StudentModal";
+import AdvertisementModal from "../../modal/AdvertisementModal";
 
 function createData(title, updated_date, description, action) {
     return { title, updated_date, description, action };
@@ -31,10 +32,10 @@ const courses = [
 ];
 
 
-function StudentInfoTable() {
+function AdvertisementInfoTable() {
     let navigate = useNavigate();
 
-    const [studentData, setStudentData] = useState([]);
+    const [advertisementData, setAdvertisementData] = useState([]);
     
     const [editData, setEditData] = useState([]);
 
@@ -64,10 +65,10 @@ function StudentInfoTable() {
         setEditData(null);
       };
 
-      const handleOpenEditStudentModal = (student) => {
+      const handleOpenEditAdvertisementModal = (advertisement) => {
         setOpen(true);
-        setEditData(student);
-        console.log(student);
+        setEditData(advertisement);
+        console.log(advertisement);
       };
        
       
@@ -87,28 +88,30 @@ function StudentInfoTable() {
         navigate("/freelancerpayment/new", { replace: true });
     }
 
-    function deleteStudent(freelancerid) {
-        console.log(freelancerid);
-        Axios.delete(`http://localhost:3001/api/student/${freelancerid}`).then((response) => {
-          console.log("Nishaa Gopi");
-          alert(response.data.message);
-          window.location.reload(false);
-        });
+    function deletefreelancer(freelancerid) {
+        // Axios.post("http://localhost:3001/api/deletefreelancer", {
+
+        //   freelancerid:freelancerid
+        // }).then((response) => {
+        //   console.log("Nishaa Gopi");
+        //   // alert(response.data.message);
+        //   window.location.reload(false);
+        // });
     }
 
     const startIndex = page * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     // const displayedData = teacherData.slice(startIndex, endIndex);
-    const displayedData = Array.isArray(studentData) ? studentData.slice(startIndex, endIndex) : [];
+    const displayedData = Array.isArray(advertisementData) ? advertisementData.slice(startIndex, endIndex) : [];
 
 
     const fetchData = async () => {
         try {
-            Axios.get("http://localhost:3001/api/students").then(
+            Axios.get("http://localhost:3001/api/getAllAdvertisement").then(
                 (response) => {
                     console.log(response.data);
                     // setTeacherData(...teacherData, response.data);
-                    setStudentData(response.data);
+                    setAdvertisementData(response.data);
                 }
             );
         } catch (error) {
@@ -140,14 +143,14 @@ function StudentInfoTable() {
                 >
                     <Box sx={{ my: 2 }}>
                         <Button style={{ width: "180px" }} onClick={handleOpenAddStudentModal} variant="contained" startIcon={<AddIcon />}>
-                            Add Student
+                            Add Advertisement
                         </Button>
                     </Box>
 
                     <Box>
                      {/* <CreateStudentModal setOpen={setOpen} open={open} /> */}
                      {/* <EditStudentModal setOpen={setOpen1} open={open1} data={editData} /> */}
-                     <StudentModal setOpen={setOpen} open={open}  studentToEdit={editData}/>
+                     <AdvertisementModal setOpen={setOpen} open={open}  advertisementToEdit={editData}/>
                     </Box>
                 </Box>
             </div>
@@ -156,16 +159,23 @@ function StudentInfoTable() {
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell><b>Name</b></TableCell>
-                            <TableCell><b>Username</b></TableCell>
-                            <TableCell ><b> Email</b></TableCell>
+                            <TableCell><b>Full Name</b></TableCell>
+                            <TableCell><b>Subject</b></TableCell>
+                            <TableCell ><b> Language</b></TableCell>
+                            <TableCell ><b> City</b></TableCell>
+                            <TableCell ><b> Description</b></TableCell>
+                            <TableCell ><b> Type</b></TableCell>
+                            <TableCell ><b> Mobile No.</b></TableCell>
+                            <TableCell ><b> Email Address</b></TableCell>
+                            <TableCell ><b> State</b></TableCell>
+                            <TableCell ><b> Image</b></TableCell>
                             <TableCell><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {displayedData.map((row) => (
                             <TableRow
-                                key={row.name}
+                                key={row.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
                                 {/* <TableCell component="th" scope="row">
@@ -173,13 +183,22 @@ function StudentInfoTable() {
           {row.imgPath}
         </TableCell> */}
                                 <TableCell >{row.name}</TableCell>
-                                <TableCell >{row.username}</TableCell>
+                                <TableCell >{row.subject}</TableCell>
+                                <TableCell >{row.language}</TableCell>
+                                <TableCell >{row.city}</TableCell>
+                                <TableCell >{row.description}</TableCell>
+                                <TableCell >{row.type}</TableCell>
+                                <TableCell >{row.mobile}</TableCell>
                                 <TableCell >{row.email}</TableCell>
+                                <TableCell >{row.state}</TableCell>
+                                <TableCell>
+                             <img src={row.img_path} alt="Course Image" style={{ width: '50px', height: '50px' }} />
+                            </TableCell>
                                 <TableCell > <Stack direction="row" spacing={1}>
-                                    <IconButton aria-label="edit" onClick={() => handleOpenEditStudentModal(row)}>
+                                    <IconButton aria-label="edit" onClick={() => handleOpenEditAdvertisementModal(row)}>
                                         <EditIcon />
                                     </IconButton>
-                                    <IconButton aria-label="delete" color="error" onClick={() => deleteStudent(row.id)}>
+                                    <IconButton aria-label="delete" color="error" onClick={() => deletefreelancer(row.freelancerid)}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </Stack>
@@ -192,7 +211,7 @@ function StudentInfoTable() {
             <TablePagination
                 rowsPerPageOptions={[10, 25, 100]}
                 component="div"
-                count={studentData.length}
+                count={advertisementData.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
@@ -203,4 +222,4 @@ function StudentInfoTable() {
     );
 }
 
-export default StudentInfoTable;
+export default AdvertisementInfoTable;

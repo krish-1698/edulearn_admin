@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Container, Paper, Typography, TextField, Button, InputAdornment, IconButton } from "@mui/material/";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material/";
+import axios from "axios";
 
 const Register = () => {
+  let navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -16,6 +18,37 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    const data = {
+      email:email,
+      password:password,
+      username:username,
+      name: name
+    }
+    axios
+    .post("http://localhost:3001/api/signup",{
+      data: data
+  })
+    .then((res) => {
+      // setCourses(res.data);
+      // setCourses(res.data);
+      console.log(res.data); 
+      if(res.data != null){
+        navigate("/", { replace: true });
+        // localStorage.setItem("userType",res.data[0].role);
+      }
+      else{
+        if(res.msg!=null)
+        alert("res.msg");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+    console.log("Email:", email);
+    console.log("Password:", password);
+  
+
     // Handle form submission here, e.g., send email and password to the server
     // You can perform validation and make API requests here
     console.log("Email:", email);

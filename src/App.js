@@ -7,6 +7,9 @@ import Users from "./pages/users/users";
 import Students from "./pages/students/student";
 import Teachers from "./pages/Teachers/teachers";
 import Courses from "./pages/Courses/courses";
+import Advertisements from "./pages/Advertsiements/advertisments";
+import Enrolments from "./pages/Enrolments/enrolments";
+import Groups from "./pages/Groups/groups";
 
 const App = () => {
 
@@ -23,6 +26,9 @@ const App = () => {
           <Route path="/students" element={<Students userType={userType}/>} />
           <Route path="/teachers" element={<Teachers userType={userType}/>} />
           <Route path="/courses" element={<Courses userType={userType}/>} />
+          <Route path="/advertisements" element={<Advertisements userType={userType}/>} />
+          <Route path="/enrolments" element={<Enrolments userType={userType}/>} />
+          <Route path="/groups" element={<Groups userType={userType}/>} />
           {/* Add more routes for other components/pages */}
         </Routes>
       </div>

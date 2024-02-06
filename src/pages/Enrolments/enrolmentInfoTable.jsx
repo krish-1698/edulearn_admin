@@ -17,10 +17,10 @@ import Axios from "axios";
 import { Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import TablePagination from "@mui/material/TablePagination";
-import CreateTeacherModal from "../../modal/createTeacherModal";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
 import CourseModal from "../../modal/CourseModal";
+import EnrolmentModal from "../../modal/enrolmentModal";
 
 function createData(title, updated_date, description, action) {
     return { title, updated_date, description, action };
@@ -33,10 +33,10 @@ const courses = [
 ];
 
 
-function CourseInfoTable() {
+function EnrolmentInfoTable() {
     let navigate = useNavigate();
 
-    const [courseData, setCourseData] = useState([]);
+    const [enrolmentData, setEnrolmentData] = useState([]);
     const [courseContentData, setCourseContentData] = useState([]);
 
     const [page, setPage] = React.useState(0);
@@ -116,34 +116,32 @@ function CourseInfoTable() {
     const startIndexContent = pageContent * rowsPerPageContent;
     const endIndexContent = startIndexContent + rowsPerPageContent;
     // const displayedData = teacherData.slice(startIndex, endIndex);
-    const displayedData = Array.isArray(courseData) ? courseData.slice(startIndex, endIndex) : [];
-    const displayedDataForContent = Array.isArray(courseContentData) ? courseContentData.slice(startIndexContent, endIndexContent) : [];
+    const displayedData = Array.isArray(enrolmentData) ? enrolmentData.slice(startIndex, endIndex) : [];
+    // const displayedDataForContent = Array.isArray(courseContentData) ? courseContentData.slice(startIndexContent, endIndexContent) : [];
 
     const fetchData = async () => {
         try {
+
             if(localStorage.getItem('userType') == 'Teacher'){
-                Axios.get(`http://localhost:3001/api/allcoursesForTeacher/${localStorage.getItem('user_id')}`).then(
+                Axios.get(`http://localhost:3001/api/enrolmentForTeacher/${localStorage.getItem('user_id')}`).then(
                     (response) => {
                         console.log(response.data);
                         // setTeacherData(...teacherData, response.data);
-                        setCourseData(response.data);
+                        setEnrolmentData(response.data);
                     })
                     .catch((err) => {
                       console.log(err);
                     });
-              }
-              else{
-                Axios.get("http://localhost:3001/api/allCourses").then(
-                    (response) => {
-                        console.log(response.data);
-                        // setTeacherData(...teacherData, response.data);
-                        setCourseData(response.data);
-                    }
-                );
-              }
+              }else{
 
-
-           
+              }
+            Axios.get("http://localhost:3001/api/getAllEnrolments").then(
+                (response) => {
+                    console.log(response.data);
+                    // setTeacherData(...teacherData, response.data);
+                    setEnrolmentData(response.data);
+                }
+            );
 
             // fetchContentData();
         } catch (error) {
@@ -153,26 +151,13 @@ function CourseInfoTable() {
 
     const fetchContentData = async () => {
         try {
-            if(localStorage.getItem('userType') == 'Teacher'){
-                Axios.get(`http://localhost:3001/api/subTopicForTeacher/${localStorage.getItem('user_id')}`).then(
-                    (response) => {
-                        console.log(response.data);
-                        // setTeacherData(...teacherData, response.data);
-                        setCourseData(response.data);
-                    })
-                    .catch((err) => {
-                      console.log(err);
-                    });
-              }else{
-                Axios.get("http://localhost:3001/api/subTopic").then(
-                    (response) => {
-                        console.log(response.data);
-                        // setTeacherData(...teacherData, response.data);
-                        setCourseContentData(response.data);
-                    }
-                );
-              }
-           
+            Axios.get("http://localhost:3001/api/subTopic").then(
+                (response) => {
+                    console.log(response.data);
+                    // setTeacherData(...teacherData, response.data);
+                    setCourseContentData(response.data);
+                }
+            );
 
             
         } catch (error) {
@@ -218,7 +203,7 @@ function CourseInfoTable() {
             <ToastContainer hideProgressBar={true} /> 
  
             <div style={{float:" left", width: "98%"}}>
-                <h2>Courses</h2></div> 
+                <h2>Enrolments</h2></div> 
             <div style={{float: "left", width: "2%"}}>
                 <Box
                     sx={{
@@ -229,13 +214,13 @@ function CourseInfoTable() {
                 >
                     <Box sx={{ my: 2 }}>
                         <Button style={{ width: "180px" }} onClick={handleOpenAddCourseModal} variant="contained" startIcon={<AddIcon />}>
-                            Add Course
+                            Add Enrolment
                         </Button>
                     </Box>
 
                     <Box>
                         {/* <CreateTeacherModal setOpen={setOpen} open={open} /> */}
-                        <CourseModal setOpen={setOpen} open={open} courseToEdit={editData} />
+                        <EnrolmentModal setOpen={setOpen} open={open} courseToEdit={editData} />
                     </Box>
 
                 </Box>
@@ -245,14 +230,10 @@ function CourseInfoTable() {
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell><b>Title</b></TableCell>
-                            <TableCell><b>Description</b></TableCell>
-                            <TableCell ><b> Language</b></TableCell>
-                            <TableCell ><b> Amount</b></TableCell>
-
-                            <TableCell ><b>Subject</b></TableCell>
-                            <TableCell ><b>Teacher</b></TableCell>
-                            <TableCell><b>Hours</b></TableCell>
+                            <TableCell><b>Course Name</b></TableCell>
+                            <TableCell><b>Teacher Name</b></TableCell>
+                            <TableCell><b>Enroled Date</b></TableCell>
+                            <TableCell><b>Student Name</b></TableCell>
                             <TableCell ><b>Actions</b></TableCell>
                         </TableRow>
                     </TableHead>
@@ -267,12 +248,9 @@ function CourseInfoTable() {
           {row.imgPath}
         </TableCell> */}
                                 <TableCell>{row.title}</TableCell>
-                                <TableCell >{row.description}</TableCell>
-                                <TableCell >{row.language}</TableCell>
-                                <TableCell >{row.amount}</TableCell>
-                                <TableCell >{row.subject}</TableCell>
-                                <TableCell >{row.name}</TableCell>
-                                <TableCell >{row.hours}</TableCell>
+                                <TableCell>{row.tname}</TableCell>
+                                <TableCell>{row.enroled_date}</TableCell>
+                                <TableCell >{row.sname}</TableCell>
                                 <TableCell > <Stack direction="row" spacing={1}>
 
 
@@ -301,7 +279,7 @@ function CourseInfoTable() {
             <TablePagination
                 rowsPerPageOptions={[10, 25, 100]}
                 component="div"
-                count={courseData.length}
+                count={enrolmentData.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
@@ -309,31 +287,9 @@ function CourseInfoTable() {
                 style={{ marginLeft: '800px' }}
             />
 
-<div style={{float:" left", width: "98%"}}>
-                <h2>Course Content</h2></div> 
-            <div style={{float: "left", width: "2%"}}>
-                <Box
-                    sx={{
-                        display: "flex",
-                        width: "80%",
-                        justifyContent: "flex-end",
-                    }}
-                >
-                    <Box sx={{ my: 2 }}>
-                        <Button style={{ width: "180px" }} onClick={handleOpenAddCourseModal} variant="contained" startIcon={<AddIcon />}>
-                            Add Sub Topic
-                        </Button>
-                    </Box>
 
-                    <Box>
-                        {/* <CreateTeacherModal setOpen={setOpen} open={open} /> */}
-                        <CourseModal setOpen={setOpen} open={open} courseToEdit={editData} />
-                    </Box>
-
-                </Box>
-                </div>
     
-            <TableContainer component={Paper}>
+            {/* <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
@@ -348,12 +304,12 @@ function CourseInfoTable() {
                             <TableRow
                                 key={row.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
+                            > */}
                                 {/* <TableCell component="th" scope="row">
           <img src="https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8&w=1000&q=80"  width={"100px"} height={"100px"} /  >
           {row.imgPath}
         </TableCell> */}
-                                <TableCell >{row.courseName}</TableCell>
+                                {/* <TableCell >{row.courseName}</TableCell>
                                 <TableCell >{row.title}</TableCell>
                                 <TableCell >{row.file_type}</TableCell>
                                 <TableCell > <Stack direction="row" spacing={1}>
@@ -363,10 +319,10 @@ function CourseInfoTable() {
                                             <EditIcon />
                                         </IconButton>
                                     
-                                    <Box style={{ position: "relative" }}>
+                                    <Box style={{ position: "relative" }}> */}
                                     {/* <CreateTeacherModal setOpen={setOpen} open={open} /> */}
                                         {/* <EditTeacherModal setOpen={setOpen1} open={open1} data={row} /> */}
-                                    </Box>
+                                    {/* </Box>
 
 
                                     <IconButton aria-label="delete" color="error" onClick={() => deletefreelancer(row.freelancerid)}>
@@ -379,17 +335,8 @@ function CourseInfoTable() {
                         ))}
                     </TableBody>
                 </Table>
-            </TableContainer>
-            <TablePagination
-                rowsPerPageOptions={[10, 25, 100]}
-                component="div"
-                count={courseContentData.length}
-                rowsPerPage={rowsPerPageContent}
-                page={pageContent}
-                onPageChange={handleChangePageForContent}
-                onRowsPerPageChange={handleChangeRowsPerPageForContent}
-                style={{ marginLeft: '800px' }}
-            />
+            </TableContainer> */}
+   
         </>
 
 
@@ -397,4 +344,4 @@ function CourseInfoTable() {
     );
 }
 
-export default CourseInfoTable;
+export default EnrolmentInfoTable;

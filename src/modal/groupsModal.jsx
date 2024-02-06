@@ -13,9 +13,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import {ImageUploadWidget} from '../components/CloudinaryFileUpload';
+import UploadIcon from '@mui/icons-material/Upload';
 
 
-function StudentModal({ open, setOpen, studentToEdit }) {
+function GroupModal({ open, setOpen, studentToEdit }) {
     let navigate = useNavigate();
 
     const [teacherData, setTeacherData] = useState([]);
@@ -37,30 +39,30 @@ function StudentModal({ open, setOpen, studentToEdit }) {
         setSelectedFile(file);
     }
 
+    const [image, setImage] = useState('');
+
+    const handleOnUpload = (error, result, widget) => {
+        if ( error ) {
+          widget.close({
+            quiet: true
+          });
+          return;
+        }
+        setImage(result?.info?.secure_url);
+        console.log(result);
+      }
 
     const editStudent = () => {
 
-        
-       const formData = new FormData();
-        console.log(studentToEdit);
-        console.log(username);
-        formData.append("username", username);
-        formData.append("name", name);
-        formData.append("email", email);
-        formData.append("password", password);
         if(studentToEdit == null){
 
             const data1 = {
-                username: username,
                 name: name,
-                email: email,
-                password: password,
+                img_path: image,
               };
-    console.log(formData);  
-    console.log(data1);
 
         axios
-            .post("http://localhost:3001/api/signup", {
+            .post("http://localhost:3001/api/createGroup", {
                 data: data1
             })
             .then((res) => {
@@ -68,8 +70,8 @@ function StudentModal({ open, setOpen, studentToEdit }) {
                 // setName(res.data);
                 console.log(res.data);
                 handleClose();
-                window.alert("Student added successfully")
-                navigate('/students')
+                window.alert("Group added successfully")
+                navigate('/groups')
                 window.location.reload(false);
             })
             .catch((err) => {
@@ -77,14 +79,12 @@ function StudentModal({ open, setOpen, studentToEdit }) {
             });
 }else{
     const data1 = {
-        username: username,
         name: name,
-        email: email,
-        password: password,
-        user_id: studentToEdit.id
+        img_path: image,
+        group_id: studentToEdit.id
       };
     axios
-    .put("http://localhost:3001/api/editUser", {
+    .put("http://localhost:3001/api/editGroup", {
         data: data1
     })
     .then((res) => {
@@ -92,8 +92,8 @@ function StudentModal({ open, setOpen, studentToEdit }) {
         // setName(res.data);
         console.log(res.data);
         handleClose();
-        window.alert("Student edited successfully")
-        navigate('/students')
+        window.alert("Group edited successfully")
+        navigate('/groups')
         window.location.reload(false);
     })
     .catch((err) => {
@@ -127,15 +127,11 @@ function StudentModal({ open, setOpen, studentToEdit }) {
     useEffect(() =>{
         if (studentToEdit) {
             setName(studentToEdit.name || "");
-            setUsername(studentToEdit.username || "");          
-            setPassword(studentToEdit.password || "");
-            setEmail(studentToEdit.email || "");
+            setImage(studentToEdit.img_path || "");          
             
           }else{
             setName("");
-            setUsername("");          
-            setPassword("");
-            setEmail("");
+            setImage("");          
           }
          
     }, [studentToEdit]);
@@ -161,7 +157,7 @@ function StudentModal({ open, setOpen, studentToEdit }) {
                             variant="h6"
                             sx={{ fontWeight: 500 }}
                         >
-                             {studentToEdit ? "Edit Student" : "Add New Student"}
+                             {studentToEdit ? "Edit Group" : "Add New Group"}
                         </Typography>
 
                         <Typography pl={1} pt={1}>
@@ -177,43 +173,25 @@ function StudentModal({ open, setOpen, studentToEdit }) {
                         ></TextField>
 
 
-                        <Typography pl={1} pt={1}>
-                            Username
-                        </Typography>
-                        <TextField
-                            multiline
-                            maxRows={4}
-                            sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                            placeholder="Username"
-                            size="small"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        ></TextField>
-
-
-                        <Typography pl={1} pt={1}>
-                            Email
-                        </Typography>
-                        <TextField
-                            sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                            placeholder="Qualification"
-                            size="small"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        ></TextField>
-
-                        <Typography pl={1} pt={1}>
-                            Password
-                        </Typography>
-                        <TextField
-                            type="password"
-                            sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                            placeholder="Password"
-                            size="small"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        ></TextField>
-
+                    <Typography pl={1} pt={1}>
+                            Image
+                            </Typography>
+                          {image && <img src={image} alt="menu item" className="image-preview"/>}
+                          <ImageUploadWidget onUpload={handleOnUpload}>
+                            {({ open }) => {
+                                function handleOnClick(e) {
+                                e.preventDefault();
+                                console.log("hekko");
+                                open();
+                                }
+                                return (
+                                <button onClick={handleOnClick} id="upload-button">
+                                    <UploadIcon />
+                                    Upload
+                                </button>
+                                )
+                            }}
+                                </ImageUploadWidget>
                         
                      
                         <Box
@@ -241,4 +219,4 @@ function StudentModal({ open, setOpen, studentToEdit }) {
     );
 }
 
-export default StudentModal;
+export default GroupModal;

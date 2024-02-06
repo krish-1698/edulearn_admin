@@ -27,7 +27,7 @@ function CourseModal({ open, setOpen, courseToEdit }) {
     const [language, setLanguage] = useState("");
     const [amount, setAmount] = useState("");
     const [subject, setSubject] = useState("");
-    const [teacher, setTeacher] = useState("");
+    const [teacher, setTeacher] = useState({ id: "", name: "" });
     const [hours, setHours] = useState("");
     const [contentTitle, setContentTitle] = useState("");
     const [contentFile, setContentFile] = useState("");
@@ -50,7 +50,7 @@ function CourseModal({ open, setOpen, courseToEdit }) {
 
     const editCourse = () => {
        const formData = new FormData();
-        
+        console.log(courseToEdit);
         formData.append("title", title);
         formData.append("description", description);
         formData.append("language", language);
@@ -58,22 +58,67 @@ function CourseModal({ open, setOpen, courseToEdit }) {
         formData.append("amount", amount);
         formData.append("teacher", teacher);
         formData.append("hours", hours);
+        
+        if(courseToEdit == null){
+            const data1 = {
+                title: title,
+                description: description,
+                language: language,
+                subject: subject,
+                amount: amount,
+                teacher_id: teacher.id,
+                credits:3,
+                hours: hours,
+              };
+              console.log(data1);
+              axios
+              .post("http://localhost:3001/api/addCourse", {
+                  data: data1
+              })
+              .then((res) => {
+                  // setCourses(res.data);
+                  // setName(res.data);
+                  console.log(res.data);
+                  handleClose();
+                  window.alert("Course added successfully");
+                  navigate('/courses');
+                  window.location.reload(false);
+              })
+              .catch((err) => {
+                  console.log(err);
+              });
+        }else{
+            const data1 = {
+                title: title,
+                description: description,
+                language: language,
+                subject: subject,
+                amount: amount,
+                hours: hours,
+                credits:4,
+                teacher_id:teacher.id,
+                course_id:courseToEdit.id
+
+              };
+              console.log(data1);
+              axios
+              .put("http://localhost:3001/api/editCourse", {
+                  data: data1
+              })
+              .then((res) => {
+                  // setCourses(res.data);
+                  // setName(res.data);
+                  console.log(res.data);
+                  handleClose();
+                  window.alert("Course edited successfully");
+                  navigate('/courses');
+                  window.location.reload(false);
+              })
+              .catch((err) => {
+                  console.log(err);
+              });
+        }
        
-        axios
-            .post("http://localhost:3001/api/editCourse", {
-                data: formData
-            })
-            .then((res) => {
-                // setCourses(res.data);
-                // setName(res.data);
-                console.log(res.data);
-                handleClose();
-                window.alert("Course added successfully")
-                navigate('/teachers')
-            })
-            .catch((err) => {
-                console.log(err);
-            });
     }
 
     const fetchData = async () => {
@@ -97,8 +142,9 @@ function CourseModal({ open, setOpen, courseToEdit }) {
     }, []);
 
     useEffect(() => {
-        const uniqueTeacherNames = [...new Set(allTeacherData.map(item => item.name))];
-        setTeacherNames(uniqueTeacherNames);
+        // const uniqueTeacherNames = [...new Set(allTeacherData.map(item => item.name))];
+        // setTeacherNames(uniqueTeacherNames);
+        setTeacherNames([...new Set(allTeacherData.map(item => ({ id: item.id, name: item.name })))]);
     }, [allTeacherData]);
 
 
@@ -109,12 +155,20 @@ function CourseModal({ open, setOpen, courseToEdit }) {
 
 
        const subjects = [
-        {label:''},
-        { label: 'Physics' },
-        { label: 'Chemistry' },
-        { label: 'Biology' },
-        { label: 'Mathematics' },
-        { label: 'Computer Science' },
+        '',
+         'Physics' ,
+         'Chemistry',
+         'Biology' ,
+         'Mathematics' ,
+         'Computer Science' 
+    ]
+
+
+    const languages = [
+        '',
+        'English' ,
+        'Tamil' ,
+         'Sinhala'
     ]
     // const [open, setOpen] = useState();
     // const modalOpen = () => setOpen(true);
@@ -132,7 +186,7 @@ function CourseModal({ open, setOpen, courseToEdit }) {
           setLanguage(courseToEdit.language || "");
           setSubject(courseToEdit.subject || "");
           setAmount(courseToEdit.amount || "");
-          setTeacher(courseToEdit.name || "");
+          setTeacher({id:courseToEdit.teacher_id, name:courseToEdit.name } || { id: "", name: "" });
           setHours(courseToEdit.hours || "0");
           setState(courseToEdit.state || "ACTIVE");
         } else{
@@ -197,10 +251,9 @@ function CourseModal({ open, setOpen, courseToEdit }) {
                             onChange={(e,newValue) => setSubject(newValue)}
                             disablePortal
                             options={subjects}
-                            isOptionEqualToValue={(option, value) => option.label === value.label}
                             value={subject || ''}
                             sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                            renderInput={(params) => <TextField {...params} label="Select Subject" />}
+                            renderInput={(params) => <TextField {...params} placeholder="Select Subject" />}
                         />
 
                         <Typography pl={1} pt={1}>
@@ -218,6 +271,18 @@ function CourseModal({ open, setOpen, courseToEdit }) {
                         <Typography pl={1} pt={1}>
                             Language
                         </Typography>
+                        <Autocomplete
+                            onChange={(e,newValue) => setLanguage(newValue)}
+                            disablePortal
+                            options={languages}
+                            isOptionEqualToValue={(option, value) => option.label === value.label}
+                            value={language || ''}
+                            sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
+                            renderInput={(params) => <TextField {...params} placeholder="Select Language" />}
+                        />
+                        {/* <Typography pl={1} pt={1}>
+                            Language
+                        </Typography>
                         <TextField
                             multiline
                             maxRows={4}
@@ -226,23 +291,23 @@ function CourseModal({ open, setOpen, courseToEdit }) {
                             size="small"
                             value={language || ''}
                             onChange={(e) => setLanguage(e.target.value)}
-                        ></TextField>
+                        ></TextField> */}
 
-                        <Typography pl={1} pt={1}>
+                            <Typography pl={1} pt={1}>
                             Teacher
-                        </Typography>
-                        <Autocomplete
+                            </Typography>
+                            <Autocomplete
                             onChange={(e, newValue) => setTeacher(newValue)}
                             disablePortal
                             id="combo-box-demo"
-                            options={teacherNames}
-                            value={teacher || ''}
+                            options={teacherNames.map((teacher) => ({ id: teacher.id, name: teacher.name }))}
+                            getOptionLabel={(teacher) => teacher.name}
+                            value={teacher}
                             renderInput={(params) => (
-                                <TextField {...params} />
+                                <TextField {...params} placeholder="Select Teacher" />
                             )}
-                            
                             sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                        />
+                            />
 
                         <Typography pl={1} pt={1}>
                             Amount

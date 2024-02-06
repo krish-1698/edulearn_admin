@@ -7,7 +7,7 @@ import { CardActionArea } from '@mui/material';
 // import axios from "axios";
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 
-function DashboardCountCard({coursesCount}) {
+function DashboardCountCard({coursesCount, studentCount, teacherCount}) {
 
     const [student, setStudents] = useState([]);
 
@@ -33,7 +33,7 @@ function DashboardCountCard({coursesCount}) {
                             No. of Courses
                         </Typography>
                         <Typography  variant="h4" component="div" align='center' fontWeight= "bold" >
-                            {/* {coursesCount}*/}10
+                            {coursesCount}
                         </Typography>
                     </CardContent>
                 </CardActionArea>
@@ -50,15 +50,16 @@ function DashboardCountCard({coursesCount}) {
                     />
                     <CardContent>
                         <Typography variant="h6" component="div" align='center'>
-                            No. of Students
+                        {localStorage.getItem('userType') == 'Teacher' ? 'No. of Enrolments' : 'No. of Students'}
                         </Typography>   
                         <Typography  variant="h4" component="div" align='center' fontWeight= "bold" >
-                            {student}20
+                            {studentCount}
                         </Typography>
                     </CardContent>
                 </CardActionArea>
             </Card>
 
+            {localStorage.getItem('userType') != 'Teacher' && (
             <Card sx={{ margin: 2, maxWidth: 246, width:246  }}>
                 <CardActionArea>
                     <CardMedia
@@ -73,11 +74,12 @@ function DashboardCountCard({coursesCount}) {
                             No. of Teachers
                         </Typography>
                         <Typography  variant="h4" component="div" align='center' fontWeight= "bold" >
-                            {lecturer}10
+                            {teacherCount}
                         </Typography>
                     </CardContent>
                 </CardActionArea>
             </Card>
+            )}
         </div>
     )
 }

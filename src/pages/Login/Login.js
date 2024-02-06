@@ -21,8 +21,10 @@ const Login = () => {
       console.log(res.data.length); 
       if(res.data.length == 1){
         navigate("/dashboard", { replace: true });
-        console.log(res.data[0].role);
+        console.log(res.data);
         localStorage.setItem("userType",res.data[0].role);
+        localStorage.setItem("user_id",res.data[0].id);
+        localStorage.setItem("name",res.data[0].name);
       }
       else{
         alert("Invalid login");
