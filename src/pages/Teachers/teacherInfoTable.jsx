@@ -21,6 +21,7 @@ import CreateTeacherModal from "../../modal/createTeacherModal";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
 import TeacherModal from "../../modal/TeacherModal";
+import Tooltip from '@mui/material/Tooltip';
 
 function createData(title, updated_date, description, action) {
     return { title, updated_date, description, action };
@@ -87,15 +88,21 @@ function StudentInfoTable() {
         navigate("/freelancerpayment/new", { replace: true });
     }
 
-    function deletefreelancer(freelancerid) {
-        // Axios.post("http://localhost:3001/api/deletefreelancer", {
-
-        //   freelancerid:freelancerid
-        // }).then((response) => {
-        //   console.log("Nishaa Gopi");
-        //   // alert(response.data.message);
-        //   window.location.reload(false);
-        // });
+    function deleteTeacher(teacherId,userId) {
+        const confirmed = window.confirm("Are you sure you want to delete this teacher?");
+        if(confirmed){
+        Axios.delete(`http://localhost:3001/api/teacher/${teacherId}/${userId}`).then((response) => {
+          console.log("Nishaa Gopi");
+          alert("Teacher Deleted Successfully");
+          window.location.reload(false);
+        }).
+        catch((err) => {
+            if (err.response && err.response.status === 400) {
+              alert(err.response.data);
+            }
+            console.log(err.response.data);
+          });
+        }
     }
 
     const startIndex = page * rowsPerPage;
@@ -194,7 +201,7 @@ function StudentInfoTable() {
                     <TableBody>
                         {displayedData.map((row) => (
                             <TableRow
-                                key={row.name}
+                                key={row.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
                                 {/* <TableCell component="th" scope="row">
@@ -212,9 +219,11 @@ function StudentInfoTable() {
 
 
                                     {row.Verified === 0 ? (
+                                        <Tooltip title="Verify Teacher">
                                         <IconButton aria-label="verify" color="info" onClick={() => onClickVerify(row)}>
                                             <VerifyIcon />
                                         </IconButton>
+                                        </Tooltip>
                                     ) : (
                                         <IconButton aria-label="edit" onClick={() => handleOpenEditTeacherModal(row)}>
                                             <EditIcon />
@@ -226,7 +235,7 @@ function StudentInfoTable() {
                                     </Box>
 
 
-                                    <IconButton aria-label="delete" color="error" onClick={() => deletefreelancer(row.freelancerid)}>
+                                    <IconButton aria-label="delete" color="error" onClick={() => deleteTeacher(row.id,row.user_id)}>
                                         <DeleteIcon />
                                     </IconButton>
 

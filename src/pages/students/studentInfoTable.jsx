@@ -88,12 +88,21 @@ function StudentInfoTable() {
     }
 
     function deleteStudent(freelancerid) {
+        const confirmed = window.confirm("Are you sure you want to delete this student?");
         console.log(freelancerid);
+        if(confirmed){
         Axios.delete(`http://localhost:3001/api/student/${freelancerid}`).then((response) => {
           console.log("Nishaa Gopi");
           alert(response.data.message);
           window.location.reload(false);
-        });
+        }).
+        catch((err) => {
+            if (err.response && err.response.status === 400) {
+              alert(err.response.data);
+            }
+            console.log(err.response.data);
+          });
+        }
     }
 
     const startIndex = page * rowsPerPage;

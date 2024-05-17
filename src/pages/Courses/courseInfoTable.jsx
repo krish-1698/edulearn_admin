@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Collapse,Typography } from "@mui/material";
 import React, { useState, useEffect } from "react";
 
 import { AddCircle as AddIcon, Create } from "@mui/icons-material";
@@ -12,6 +12,7 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { KeyboardArrowDown as ArrowDownIcon, KeyboardArrowUp as ArrowUpIcon } from '@mui/icons-material';
 import VerifyIcon from "@mui/icons-material/CheckCircle"
 import Axios from "axios";
 import { Stack } from "@mui/material";
@@ -21,6 +22,9 @@ import CreateTeacherModal from "../../modal/createTeacherModal";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
 import CourseModal from "../../modal/CourseModal";
+import CourseContentModal from "../../modal/courseContentModal";
+import Tooltip from '@mui/material/Tooltip';
+
 
 function createData(title, updated_date, description, action) {
     return { title, updated_date, description, action };
@@ -63,6 +67,17 @@ function CourseInfoTable() {
         setPageContent(0);
     };
 
+    const [expandedRows, setExpandedRows] = useState({}); // State to manage expanded rows
+
+    // Function to toggle the visibility of additional content for a row
+    const toggleRowExpansion = (rowId) => {
+      setExpandedRows((prevState) => ({
+        ...prevState,
+        [rowId]: !prevState[rowId], // Toggle the state for the clicked row
+      }));
+      fetchContentForEachRow(rowId);
+    };
+
     function onClickVerify(row) {
         Axios.put(`http://localhost:3001/api/verifyTeacher/${row.id}`)
             .then((response) => {
@@ -99,15 +114,39 @@ function CourseInfoTable() {
         navigate("/freelancerpayment/new", { replace: true });
     }
 
-    function deletefreelancer(freelancerid) {
-        // Axios.post("http://localhost:3001/api/deletefreelancer", {
+    function deleteCourseContent(contentId) {
+        const confirmed = window.confirm("Are you sure you want to delete this content?");
+  
+        // Check if the user confirmed the action
+        if (confirmed) {
+            Axios.delete(`http://localhost:3001/api/deleteSubTopic/${contentId}`).then((response) => {
+                console.log("Nishaa Gopi");
+                alert("Content Deleted successfully");
+                window.location.reload(false);
+              });
+        }         
+    }
 
-        //   freelancerid:freelancerid
-        // }).then((response) => {
-        //   console.log("Nishaa Gopi");
-        //   // alert(response.data.message);
-        //   window.location.reload(false);
-        // });
+    function deleteCourse(courseId) {
+        const confirmed = window.confirm("Are you sure you want to delete this course?");
+    
+        // Check if the user confirmed the action
+        if (confirmed) {
+            Axios.delete(`http://localhost:3001/api/deleteCourse/${courseId}`)
+                .then((response) => {
+                    console.log("Nishaa Gopi");
+                    window.alert("Course Deleted successfully");
+                    window.location.reload(false);
+                })
+                .catch((err) => {
+                    if (err.response && err.response.status === 403) {
+                        window.alert(err.response.data);
+                    } else {
+                        window.alert("An error occurred while deleting the course.");
+                    }
+                    console.log(err);
+                });
+        }
     }
 
     const startIndex = page * rowsPerPage;
@@ -170,7 +209,10 @@ function CourseInfoTable() {
                         // setTeacherData(...teacherData, response.data);
                         setCourseContentData(response.data);
                     }
-                );
+                )
+                .catch((err) => {
+                    console.log(err);
+                  });
               }
            
 
@@ -180,16 +222,21 @@ function CourseInfoTable() {
         }
     };
 
-    //   useEffect(() => {
-    //     Axios.get("http://localhost:3001/api/teachers").then(
-    //         (response) => {
-    //             console.log(response.data);
+    const [courseContentRowData, setCourseContentRowData] = useState([]);
 
-    //             setTeacherData(...teacherData, response.data);
 
-    //         }
-    //     );
-    // }, []);
+      const fetchContentForEachRow = (courseId) => {
+        Axios.get(`http://localhost:3001/api/subTopicbyCourseId/${courseId}`).then(
+            (response) => {
+                console.log(response.data);
+                // setTeacherData(...teacherData, response.data);
+                setCourseContentRowData(response.data);
+            }
+        )
+        .catch((err) => {
+            console.log(err);
+          });
+    }
 
     const handleOpenAddCourseModal = () => {
         setOpen(true);
@@ -198,6 +245,20 @@ function CourseInfoTable() {
 
       const handleOpenEditCourseModal = (course) => {
         setOpen(true);
+        setEditData(course);
+      };
+    const [courseId, setCourseId] = useState([]);
+
+
+      const handleOpenAddCourseContentModal = (courseId) => {
+        setOpen1(true);
+        setCourseId(courseId);
+        setEditData(null);
+      };
+
+      const handleOpenEditCourseContentModal = (course) => {
+        setOpen1(true);
+        setCourseId(null);
         setEditData(course);
       };
        
@@ -209,7 +270,9 @@ function CourseInfoTable() {
     }, []);
 
     const [open, setOpen] = useState(false);
+    const [open1, setOpen1] = useState(false);
     const modalOpen = () => setOpen(true);
+    const modalOpen1 = () => setOpen1(true);
 
     return (
 
@@ -217,7 +280,7 @@ function CourseInfoTable() {
         <>
             <ToastContainer hideProgressBar={true} /> 
  
-            <div style={{float:" left", width: "98%"}}>
+        <div style={{float:" left", width: "98%"}}>
                 <h2>Courses</h2></div> 
             <div style={{float: "left", width: "2%"}}>
                 <Box
@@ -248,7 +311,7 @@ function CourseInfoTable() {
                             <TableCell><b>Title</b></TableCell>
                             <TableCell><b>Description</b></TableCell>
                             <TableCell ><b> Language</b></TableCell>
-                            <TableCell ><b> Amount</b></TableCell>
+                            <TableCell ><b> Course fee</b></TableCell>
 
                             <TableCell ><b>Subject</b></TableCell>
                             <TableCell ><b>Teacher</b></TableCell>
@@ -258,24 +321,24 @@ function CourseInfoTable() {
                     </TableHead>
                     <TableBody>
                         {displayedData.map((row) => (
+                            <React.Fragment key={row.id}>
                             <TableRow
                                 key={row.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                {/* <TableCell component="th" scope="row">
-          <img src="https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8&w=1000&q=80"  width={"100px"} height={"100px"} /  >
-          {row.imgPath}
-        </TableCell> */}
                                 <TableCell>{row.title}</TableCell>
                                 <TableCell >{row.description}</TableCell>
                                 <TableCell >{row.language}</TableCell>
-                                <TableCell >{row.amount}</TableCell>
+                                <TableCell >Rs.{row.amount}</TableCell>
                                 <TableCell >{row.subject}</TableCell>
                                 <TableCell >{row.name}</TableCell>
                                 <TableCell >{row.hours}</TableCell>
                                 <TableCell > <Stack direction="row" spacing={1}>
-
-
+                                <Tooltip title="Expand to view content">
+                                <IconButton aria-label="expand row" onClick={() => toggleRowExpansion(row.id)}>
+                                {expandedRows[row.id] ? <ArrowUpIcon /> : <ArrowDownIcon />}
+                            </IconButton>
+                            </Tooltip>
                                  
                                         <IconButton aria-label="edit" onClick={() => handleOpenEditCourseModal(row)}>
                                             <EditIcon />
@@ -285,15 +348,77 @@ function CourseInfoTable() {
                                     {/* <CreateTeacherModal setOpen={setOpen} open={open} /> */}
                                         {/* <EditTeacherModal setOpen={setOpen1} open={open1} data={row} /> */}
                                     </Box>
-
-
-                                    <IconButton aria-label="delete" color="error" onClick={() => deletefreelancer(row.freelancerid)}>
+                                   
+                                    <IconButton aria-label="delete" color="error" onClick={() => deleteCourse(row.id)}>
                                         <DeleteIcon />
                                     </IconButton>
 
                                 </Stack>
                                 </TableCell>
                             </TableRow>
+                            <TableRow>
+                            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+                            {/* Collapse component to show/hide additional content */}
+                            <Collapse in={expandedRows[row.id]} timeout="auto" unmountOnExit>
+                                {/* Your additional content for the row */}
+                                <Box style={{ float: "right",padding:'10px' }}>
+                                <Button style={{ width: "180px" }} onClick={() => handleOpenAddCourseContentModal(row.id)} variant="contained" startIcon={<AddIcon />}>
+                            Add Content
+                        </Button>
+                    </Box>
+                                <Box sx={{ margin: 1 }}>
+                                <Typography variant="body1" gutterBottom>
+                        {courseContentRowData.length != 0 ? (
+                        <TableContainer component={Paper}>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell sx={{ width: '20%' }}><b>Content Title</b></TableCell>
+                              <TableCell sx={{ width: '20%' }}><b>Content Description</b></TableCell>
+                              <TableCell sx={{ width: '50%' }}><b>Video</b></TableCell>
+                              <TableCell sx={{ width: '10%' }}><b>Actions</b></TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {/* Render content for the selected row */}
+                            {courseContentRowData.map((contentRow) => (
+                              <TableRow key={contentRow.id}>
+                                <TableCell>{contentRow.title}</TableCell>
+                                <TableCell>{contentRow.description}</TableCell>
+                                <TableCell><video src={contentRow.file_path} controls className="image-preview" /></TableCell>
+                                <TableCell > <Stack direction="row" spacing={1}>
+
+
+                                        <IconButton aria-label="edit" onClick={() => handleOpenEditCourseContentModal(contentRow)}>
+                                            <EditIcon />
+                                        </IconButton>
+                                    
+                                    <Box style={{ position: "relative" }}>
+                                    {/* <CreateTeacherModal setOpen={setOpen} open={open} /> */}
+                                        {/* <EditTeacherModal setOpen={setOpen1} open={open1} data={row} /> */}
+                                    </Box>
+
+
+                                    <IconButton aria-label="delete" color="error" onClick={() => deleteCourseContent(contentRow.id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+
+                                </Stack>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                        ):(
+                            <p><strong><i>No content available for this course.</i></strong></p>
+                        )}
+                      </Typography>
+                                </Box>
+                            </Collapse>
+                            </TableCell>
+                        </TableRow>
+                            </React.Fragment>
                         ))}
                     </TableBody>
                 </Table>
@@ -309,87 +434,10 @@ function CourseInfoTable() {
                 style={{ marginLeft: '800px' }}
             />
 
-<div style={{float:" left", width: "98%"}}>
-                <h2>Course Content</h2></div> 
-            <div style={{float: "left", width: "2%"}}>
-                <Box
-                    sx={{
-                        display: "flex",
-                        width: "80%",
-                        justifyContent: "flex-end",
-                    }}
-                >
-                    <Box sx={{ my: 2 }}>
-                        <Button style={{ width: "180px" }} onClick={handleOpenAddCourseModal} variant="contained" startIcon={<AddIcon />}>
-                            Add Sub Topic
-                        </Button>
-                    </Box>
 
                     <Box>
-                        {/* <CreateTeacherModal setOpen={setOpen} open={open} /> */}
-                        <CourseModal setOpen={setOpen} open={open} courseToEdit={editData} />
+                        <CourseContentModal setOpen={setOpen1} open={open1} courseToEdit={editData} courseId = {courseId}/>
                     </Box>
-
-                </Box>
-                </div>
-    
-            <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell><b>Course Name</b></TableCell>
-                            <TableCell><b>Content Title</b></TableCell>
-                            <TableCell ><b> File Type</b></TableCell>
-                            <TableCell ><b>Actions</b></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {displayedDataForContent.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
-                                {/* <TableCell component="th" scope="row">
-          <img src="https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8&w=1000&q=80"  width={"100px"} height={"100px"} /  >
-          {row.imgPath}
-        </TableCell> */}
-                                <TableCell >{row.courseName}</TableCell>
-                                <TableCell >{row.title}</TableCell>
-                                <TableCell >{row.file_type}</TableCell>
-                                <TableCell > <Stack direction="row" spacing={1}>
-
-
-                                        <IconButton aria-label="edit" onClick={() => handleOpenEditCourseModal(row)}>
-                                            <EditIcon />
-                                        </IconButton>
-                                    
-                                    <Box style={{ position: "relative" }}>
-                                    {/* <CreateTeacherModal setOpen={setOpen} open={open} /> */}
-                                        {/* <EditTeacherModal setOpen={setOpen1} open={open1} data={row} /> */}
-                                    </Box>
-
-
-                                    <IconButton aria-label="delete" color="error" onClick={() => deletefreelancer(row.freelancerid)}>
-                                        <DeleteIcon />
-                                    </IconButton>
-
-                                </Stack>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <TablePagination
-                rowsPerPageOptions={[10, 25, 100]}
-                component="div"
-                count={courseContentData.length}
-                rowsPerPage={rowsPerPageContent}
-                page={pageContent}
-                onPageChange={handleChangePageForContent}
-                onRowsPerPageChange={handleChangeRowsPerPageForContent}
-                style={{ marginLeft: '800px' }}
-            />
         </>
 
 

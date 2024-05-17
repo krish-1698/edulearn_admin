@@ -20,6 +20,10 @@ import TablePagination from "@mui/material/TablePagination";
 import CreateStudentModal from "../../modal/createstudentModal";
 import StudentModal from "../../modal/StudentModal";
 import AdvertisementModal from "../../modal/AdvertisementModal";
+import Tooltip from '@mui/material/Tooltip';
+import VerifyIcon from "@mui/icons-material/CheckCircle";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function createData(title, updated_date, description, action) {
     return { title, updated_date, description, action };
@@ -87,7 +91,23 @@ function AdvertisementInfoTable() {
         localStorage.setItem('data', JSON.stringify(data))
         navigate("/freelancerpayment/new", { replace: true });
     }
-
+    
+    function onClickVerify(row) {
+        Axios.put(`http://localhost:3001/api/verifyAd/${row.id}`)
+            .then((response) => {
+                toast.success("Advertisment verification updated successfully", {
+                    autoClose: 3000,
+                });
+                console.log("Advertisment verification updated successfully");
+                // You can add further handling here if needed
+                // window.location.reload(false);
+                fetchData();
+            })
+            .catch((error) => {
+                console.error("Error updating advertisment verification:", error);
+                // You can add error handling here
+            });
+    }
     function deletefreelancer(freelancerid) {
         // Axios.post("http://localhost:3001/api/deletefreelancer", {
 
@@ -107,7 +127,7 @@ function AdvertisementInfoTable() {
 
     const fetchData = async () => {
         try {
-            Axios.get("http://localhost:3001/api/getAllAdvertisement").then(
+            Axios.get("http://localhost:3001/api/getAllAds").then(
                 (response) => {
                     console.log(response.data);
                     // setTeacherData(...teacherData, response.data);
@@ -133,6 +153,7 @@ function AdvertisementInfoTable() {
 
 
         <>
+        <ToastContainer hideProgressBar={true} />
             <div style={{ marginLeft: "88%" }}>
                 <Box
                     sx={{
@@ -195,9 +216,18 @@ function AdvertisementInfoTable() {
                              <img src={row.img_path} alt="Course Image" style={{ width: '50px', height: '50px' }} />
                             </TableCell>
                                 <TableCell > <Stack direction="row" spacing={1}>
-                                    <IconButton aria-label="edit" onClick={() => handleOpenEditAdvertisementModal(row)}>
+                                {row.verified === 0 ? (
+                                        <Tooltip title="Verify Ad">
+                                        <IconButton aria-label="verify" color="info" onClick={() => onClickVerify(row)}>
+                                            <VerifyIcon />
+                                        </IconButton>
+                                        </Tooltip>
+                                    ) : (
+                                        <IconButton aria-label="edit" onClick={() => handleOpenEditAdvertisementModal(row)}>
                                         <EditIcon />
                                     </IconButton>
+                                    )}
+                                    
                                     <IconButton aria-label="delete" color="error" onClick={() => deletefreelancer(row.freelancerid)}>
                                         <DeleteIcon />
                                     </IconButton>

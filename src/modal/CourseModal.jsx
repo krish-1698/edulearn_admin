@@ -158,9 +158,7 @@ function CourseModal({ open, setOpen, courseToEdit }) {
         '',
          'Physics' ,
          'Chemistry',
-         'Biology' ,
-         'Mathematics' ,
-         'Computer Science' 
+         'Biology' 
     ]
 
 
@@ -310,7 +308,7 @@ function CourseModal({ open, setOpen, courseToEdit }) {
                             />
 
                         <Typography pl={1} pt={1}>
-                            Amount
+                            Course Fee
                         </Typography>
                         <TextField
                             sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}

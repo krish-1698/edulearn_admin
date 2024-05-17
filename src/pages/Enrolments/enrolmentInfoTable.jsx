@@ -220,7 +220,7 @@ function EnrolmentInfoTable() {
 
                     <Box>
                         {/* <CreateTeacherModal setOpen={setOpen} open={open} /> */}
-                        <EnrolmentModal setOpen={setOpen} open={open} courseToEdit={editData} />
+                        <EnrolmentModal setOpen={setOpen} open={open} enrolmentToEdit={editData} />
                     </Box>
 
                 </Box>
@@ -286,57 +286,6 @@ function EnrolmentInfoTable() {
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 style={{ marginLeft: '800px' }}
             />
-
-
-    
-            {/* <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell><b>Course Name</b></TableCell>
-                            <TableCell><b>Content Title</b></TableCell>
-                            <TableCell ><b> File Type</b></TableCell>
-                            <TableCell ><b>Actions</b></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {displayedDataForContent.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            > */}
-                                {/* <TableCell component="th" scope="row">
-          <img src="https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8&w=1000&q=80"  width={"100px"} height={"100px"} /  >
-          {row.imgPath}
-        </TableCell> */}
-                                {/* <TableCell >{row.courseName}</TableCell>
-                                <TableCell >{row.title}</TableCell>
-                                <TableCell >{row.file_type}</TableCell>
-                                <TableCell > <Stack direction="row" spacing={1}>
-
-
-                                        <IconButton aria-label="edit" onClick={() => handleOpenEditCourseModal(row)}>
-                                            <EditIcon />
-                                        </IconButton>
-                                    
-                                    <Box style={{ position: "relative" }}> */}
-                                    {/* <CreateTeacherModal setOpen={setOpen} open={open} /> */}
-                                        {/* <EditTeacherModal setOpen={setOpen1} open={open1} data={row} /> */}
-                                    {/* </Box>
-
-
-                                    <IconButton aria-label="delete" color="error" onClick={() => deletefreelancer(row.freelancerid)}>
-                                        <DeleteIcon />
-                                    </IconButton>
-
-                                </Stack>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer> */}
-   
         </>
 
 

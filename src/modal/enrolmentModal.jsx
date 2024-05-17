@@ -22,9 +22,11 @@ function EnrolmentModal({ open, setOpen, enrolmentToEdit }) {
 
     const [courseData, setAllCourseData] = useState([]);
     const [userData, setAllUserData] = useState([]);
+    const [teacherData, setAllTeacherData] = useState([]);
 
     const [course, setCourse] = useState({ id: "", name: "" });
     const [user, setUser] = useState({ id: "", name: "" });
+    const [teacher, setTeacher] = useState({ id: "", name: "" });
 
     const [name, setName] = useState("");
     const [city, setCity] = useState("");
@@ -43,6 +45,7 @@ function EnrolmentModal({ open, setOpen, enrolmentToEdit }) {
     const [imgPath, setImgPath] = useState('');
     const [courseNames, setCourseNames] = useState([]);
     const [userNames, setUserNames] = useState([]);
+    const [teacherNames, setTeacherNames] = useState([]);
 
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
@@ -55,11 +58,13 @@ function EnrolmentModal({ open, setOpen, enrolmentToEdit }) {
         // setTeacherNames(uniqueTeacherNames);
         setCourseNames([...new Set(courseData.map(item => ({ id: item.id, name: item.title })))]);
         setUserNames([...new Set(userData.map(item => ({ id: item.id, name: item.name })))]);
+        // setTeacherNames([...new Set(teacherData.map(item => ({ id: item.id, name: item.name })))]);
     }, [courseData,userData]);
 
     useEffect(() => {
         fetchCourseData();
         fetchUserData();
+        // fetchTeacherData();
     }, []);
 
     const fetchCourseData = async () => {
@@ -94,35 +99,34 @@ function EnrolmentModal({ open, setOpen, enrolmentToEdit }) {
         }
     };
 
+    // const fetchTeacherData = async () => {
+    //     try {
+    //         axios.get("http://localhost:3001/api/teachers").then(
+    //             (response) => {
+    //                 console.log(response.data);
+    //                 // setAllTeacherData(...allTeacherData, '');
+    //                 setAllTeacherData(response.data);
+    //             }
+    //         );
+
+    //         // fetchContentData();
+    //     } catch (error) {
+    //         console.error('Error fetching data:', error);
+    //     }
+    // };
+
 
 
     const editTeacher = () => {
-       const formData = new FormData();
-        
-        formData.append("city", city);
-        formData.append("nic", nic);
-        formData.append("mobile_no", mobile_no);
-        formData.append("subject", subject);
-        formData.append("qualification", qualification);
-        // formData.append("mobile_no", mobile_no);
-        formData.append("name", name);
-        formData.append("email", email);
-        formData.append("password", password);
        
         if(enrolmentToEdit == null){
             const data1 = {
-                city: city,
-                nic: nic,
-                mobile_no: mobile_no,
-                subject: subject,
-                qualification: qualification,
-                name: name,
-                email:email,
-                password: password,
+                course_id: course.id,
+                user_id: user.id,
               };
 
         axios
-            .post("http://localhost:3001/api/createTeacher", {
+            .post("http://localhost:3001/api/saveEnrolment", {
                 data: data1
             })
             .then((res) => {
@@ -130,8 +134,8 @@ function EnrolmentModal({ open, setOpen, enrolmentToEdit }) {
                 // setName(res.data);
                 console.log(res.data);
                 handleClose();
-                window.alert("Teacher added successfully");
-                navigate('/teachers');
+                window.alert("Enrolment added successfully");
+                navigate('/enrolments');
                 window.location.reload(false);
             })
             .catch((err) => {
@@ -140,21 +144,13 @@ function EnrolmentModal({ open, setOpen, enrolmentToEdit }) {
         }
         else{
             const data1 = {
-                city: city,
-                nic: nic,
-                mobile_no: mobile_no,
-                subject: subject,
-                qualification: qualification,
-                name: name,
-                email:email,
-                password: password,
-                user_id:enrolmentToEdit.user_id,
-                id:enrolmentToEdit.user_id, 
-                role:enrolmentToEdit.role
+                course_id:course.id,
+                user_id: user.id,
+                enrolment_id : enrolmentToEdit.id
               };
               console.log(data1);
               axios
-              .put("http://localhost:3001/api/editUser", {
+              .put("http://localhost:3001/api/ediEnrolment", {
                   data: data1
               })
               .then((res) => {
@@ -162,8 +158,8 @@ function EnrolmentModal({ open, setOpen, enrolmentToEdit }) {
                   // setName(res.data);
                   console.log(res.data);
                   handleClose();
-                  window.alert("Teacher edited successfully");
-                  navigate('/teachers');
+                  window.alert("Enrolment edited successfully");
+                  navigate('/enrolments');
                   window.location.reload(false);
               })
               .catch((err) => {
@@ -176,7 +172,7 @@ function EnrolmentModal({ open, setOpen, enrolmentToEdit }) {
 
 
 
-    const subjects = ['', 'Physics', 'Chemistry', 'Biology', 'Mathematics', 'Computer Science'];
+    const subjects = ['', 'Physics', 'Chemistry', 'Biology', 'Mathematics'];
     // const [open, setOpen] = useState();
     // const modalOpen = () => setOpen(true);
     // const modalOpen = () => setOpen();
@@ -185,29 +181,15 @@ function EnrolmentModal({ open, setOpen, enrolmentToEdit }) {
         setOpen(false);
     }
     useEffect(() => {
+        console.log("skm",enrolmentToEdit);
         // If enrolmentToEdit is provided, set the state with the teacher's details
         if (enrolmentToEdit) {
-          setName(enrolmentToEdit.name || "");
-          setCity(enrolmentToEdit.city || "");
-          setNic(enrolmentToEdit.nic || "");
-          setMobileNo(enrolmentToEdit.mobile_no || "");
-          setSubject(enrolmentToEdit.subject || "");
-          setQualification(enrolmentToEdit.qualification || "");
-          setPassword(enrolmentToEdit.password || "");
-          setEmail(enrolmentToEdit.email || "");
-          setState(enrolmentToEdit.state || "ACTIVE");
+          setCourse({id:enrolmentToEdit.id, name:enrolmentToEdit.title } || { id: "", name: "" });
+          setUser({id:enrolmentToEdit.sid, name:enrolmentToEdit.sname } || { id: "", name: "" });
         } else {
             // If enrolmentToEdit is not provided (i.e., adding a new teacher), reset the state
-            setName("");
-            setCity("");
-            setNic("");
-            setMobileNo("");
-            setSubject("");
-            setQualification("");
-            setPassword("");
-            setEmail("");
-            setVerified(0);
-            setState("ACTIVE");
+            setCourse( { id: "", name: "" });
+            setUser( { id: "", name: "" });
           }
       }, [enrolmentToEdit]);
 
@@ -275,102 +257,6 @@ function EnrolmentModal({ open, setOpen, enrolmentToEdit }) {
                             sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
                             key={(user) => user.id}
                             />
-                        <Typography pl={1} pt={1}>
-                        Subject
-                        </Typography>
-                        <Autocomplete
-                        onChange={(e, newValue) => setSubject(newValue)}
-                        disablePortal
-                        options={subjects}
-                        value={subject || ''}
-                        sx={{ paddingLeft: '10px', mt: '0.5rem', width: '95%' }}
-                        renderInput={(params) => <TextField {...params} placeholder="Select Subject" />}
-                        />
-
-
-                        <Typography pl={1} pt={1}>
-                            City
-                        </Typography>
-                        <TextField
-                            required
-                            sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                            placeholder="City"
-                            size="small"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                        ></TextField>
-
-                        {/* <Typography pl={1} pt={1}>
-                Amount
-              </Typography>
-              <TextField
-                multiline
-                maxRows={4}
-                sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                placeholder="Amount"
-                size="small"
-                onChange={handleOnChangeAmount}
-              ></TextField> */}
-
-                        <Typography pl={1} pt={1}>
-                            NIC
-                        </Typography>
-                        <TextField
-                            multiline
-                            maxRows={4}
-                            sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                            placeholder="NIC"
-                            size="small"
-                            value={nic}
-                            onChange={(e) => setNic(e.target.value)}
-                        ></TextField>
-
-                        <Typography pl={1} pt={1}>
-                            Mobile Number
-                        </Typography>
-                        <TextField
-                            sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                            placeholder="Mobile Number"
-                            size="small"
-                            value={mobile_no}
-                            onChange={(e) => setMobileNo(e.target.value)}
-                        ></TextField>
-
-
-                        <Typography pl={1} pt={1}>
-                            Qualification
-                        </Typography>
-                        <TextField
-                            sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                            placeholder="Qualification"
-                            size="small"
-                            value={qualification}
-                            onChange={(e) => setQualification(e.target.value)}
-                        ></TextField>
-
-                    <Typography pl={1} pt={1}>
-                            Email
-                        </Typography>
-                        <TextField
-                            sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                            placeholder="Email"
-                            size="small"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        ></TextField>
-
-                        <Typography pl={1} pt={1}>
-                            Password
-                        </Typography>
-                        <TextField
-                            type="password"
-                            sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                            placeholder="Password"
-                            size="small"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        ></TextField>
-
                         
                      
                         <Box

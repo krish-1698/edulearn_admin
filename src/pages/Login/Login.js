@@ -14,7 +14,7 @@ const Login = () => {
     // Handle form submission here, e.g., send email and password to the server
     // You can perform validation and make API requests here
     axios
-    .get(`http://localhost:3001/api/user/${email}/${password}`)
+    .get(`http://localhost:3001/api/userA/${email}/${password}`)
     .then((res) => {
       // setCourses(res.data);
       // setCourses(res.data);
@@ -31,6 +31,9 @@ const Login = () => {
       }
     })
     .catch((err) => {
+      if (err.response && (err.response.status === 401 || err.response.status === 403) ) {
+        alert(err.response.data);
+      }
       console.log(err);
     });
     console.log("Email:", email);

@@ -137,8 +137,7 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
         '',
          'Physics',
     'Chemistry' ,
-     'Biology' ,
-    'Mathematics', 'Computer Science' 
+     'Biology' 
     ]
 
 

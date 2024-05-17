@@ -125,7 +125,7 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
 
 
 
-    const subjects = ['', 'Physics', 'Chemistry', 'Biology', 'Mathematics', 'Computer Science'];
+    const subjects = ['', 'Physics', 'Chemistry', 'Biology'];
     // const [open, setOpen] = useState();
     // const modalOpen = () => setOpen(true);
     // const modalOpen = () => setOpen();

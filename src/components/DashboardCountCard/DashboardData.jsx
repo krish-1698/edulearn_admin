@@ -10,6 +10,7 @@ function DashboardData() {
    const [courseCount, setCourseCount] = useState([]);
    const [studentCount, setStudentCount] = useState([]);
    const [teacherCount, setTeacherCount] = useState([]);
+   const [income, setIncome] = useState([]);
 
   const fetchData = async () => {
     try {
@@ -73,8 +74,51 @@ function DashboardData() {
 }
 };
 
-  useEffect(() => {
+const fetchIncomeForAds = ()=>{
+  axios
+    .get("http://localhost:3001/api/getIncomeForAdsDash")
+    .then((res) => {
+      // setCourses(res.data);
+      setIncome(prevIncome => prevIncome == null ? 0: prevIncome + res.data[0].income);
+      console.log(res.data); 
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
 
+const fetchIncomeData = async () => {
+  console.log("Running...");
+  if(localStorage.getItem('userType') == 'Admin'){
+    axios
+      .get("http://localhost:3001/api/getIncomeForAdminDash")
+      .then((res) => {
+        // setCourses(res.data);
+        setIncome(res.data[0].income == null ? 0 : res.data[0].income );
+        console.log(res.data); 
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+      fetchIncomeForAds();
+  }
+  else{
+    axios
+    .get(`http://localhost:3001/api/getIncomeForTeacher/${localStorage.getItem('user_id')}`)
+    .then((res) => {
+      // setCourses(res.data);
+      setIncome(res.data[0].income);
+      console.log(res.data); 
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
+}
+
+
+  useEffect(() => {
+    console.log("Shitttttt");
     if(localStorage.getItem('userType') == 'Teacher'){
       axios.get(`http://localhost:3001/api/allcoursesForTeacher/${localStorage.getItem('user_id')}`).then(
           (response) => {
@@ -88,7 +132,7 @@ function DashboardData() {
     }
     else{
       axios
-      .get("http://localhost:3001/api/allCourses")
+      .get("http://localhost:3001/api/allCoursesV1")
       .then((res) => {
         // setCourses(res.data);
         setCourses(res.data);
@@ -97,12 +141,17 @@ function DashboardData() {
       .catch((err) => {
         console.log(err);
       });
-
       
     }
     
-    fetchData(); 
+    fetchData();
+    fetchIncomeData();
   },[]);
+
+  // useEffect(() => {
+  //   console.log("Can;tnnn");
+  //   fetchIncomeData();
+  // }, []);
 
   return (
     <div>
@@ -111,7 +160,7 @@ function DashboardData() {
       </Typography>
 
       <div>
-        <DashboardCountCard coursesCount={courseCount.courseCount} studentCount= {studentCount.studentCount} teacherCount= {teacherCount.teacherCount}/>
+        <DashboardCountCard coursesCount={courseCount.courseCount} studentCount= {studentCount.studentCount} teacherCount= {teacherCount.teacherCount} income ={income}/>
         {/* {console.log("course length is "+courses.length)} */}
       </div>
 

@@ -10,6 +10,7 @@ import Courses from "./pages/Courses/courses";
 import Advertisements from "./pages/Advertsiements/advertisments";
 import Enrolments from "./pages/Enrolments/enrolments";
 import Groups from "./pages/Groups/groups";
+import Reports from "./pages/Reports/reports";
 
 const App = () => {
 
@@ -29,6 +30,7 @@ const App = () => {
           <Route path="/advertisements" element={<Advertisements userType={userType}/>} />
           <Route path="/enrolments" element={<Enrolments userType={userType}/>} />
           <Route path="/groups" element={<Groups userType={userType}/>} />
+          <Route path="/reports" element={<Reports userType={userType}/>} />
           {/* Add more routes for other components/pages */}
         </Routes>
       </div>

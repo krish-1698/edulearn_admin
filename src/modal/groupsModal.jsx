@@ -111,8 +111,7 @@ function GroupModal({ open, setOpen, studentToEdit }) {
     const subjects = [
         { label: 'Physics' },
         { label: 'Chemistry' },
-        { label: 'Biology' },
-        { label: 'Mathematics' },
+        { label: 'Biology' }
     ]
 
     // const [open, setOpen] = useState();

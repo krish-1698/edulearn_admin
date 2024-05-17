@@ -112,7 +112,6 @@ function StudentModal({ open, setOpen, studentToEdit }) {
         { label: 'Physics' },
         { label: 'Chemistry' },
         { label: 'Biology' },
-        { label: 'Mathematics' },
     ]
 
     // const [open, setOpen] = useState();

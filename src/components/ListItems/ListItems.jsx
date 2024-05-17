@@ -11,8 +11,9 @@ import {
   Groups,
   Image,
   AutoStories,
-  Assessment,
-  ReportProblem
+  AssignmentTurnedIn,
+  Diversity3,
+  Assessment
 } from "@mui/icons-material";
 import NavBarItem from "../../components/NavBarItem/NavBarItem";
 import { Link } from "react-router-dom";
@@ -60,13 +61,18 @@ export const adminListItems = (
       },
       {
         name: "Enrolments",
-        icon: <AutoStories />,
+        icon: <AssignmentTurnedIn />,
         link: "/enrolments",
       },
       {
         name: "Groups",
-        icon: <AutoStories />,
+        icon: <Diversity3 />,
         link: "/groups",
+      },
+      {
+        name: "Reports",
+        icon: <Assessment />,
+        link: "/reports",
       },
       // {
       //   name: "Reports",
@@ -112,9 +118,9 @@ export const teacherListItems = (
       //   link: "/teachers",
       // },
       {
-        name: "Enrolments",
-        icon: <AutoStories />,
-        link: "/enrolments",
+        name: "Reports",
+        icon: <Assessment />,
+        link: "/reports",
       },
 
     ].map((item) => (
