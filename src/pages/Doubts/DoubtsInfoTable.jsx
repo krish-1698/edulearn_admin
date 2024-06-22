@@ -24,7 +24,6 @@ import { toast, ToastContainer } from "react-toastify";
 import CourseModal from "../../modal/CourseModal";
 import CourseContentModal from "../../modal/courseContentModal";
 import Tooltip from '@mui/material/Tooltip';
-import { TextField } from '@mui/material';
 
 
 function createData(title, updated_date, description, action) {
@@ -38,7 +37,7 @@ const courses = [
 ];
 
 
-function CourseInfoTable() {
+function DoubtsInfoTable() {
     let navigate = useNavigate();
 
     const [courseData, setCourseData] = useState([]);
@@ -49,7 +48,6 @@ function CourseInfoTable() {
 
     const [pageContent, setPageContent] = React.useState(0);
     const [rowsPerPageContent, setRowsPerPageContent] = React.useState(10);
-    const [searchTerm, setSearchTerm] = useState('');
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -69,33 +67,8 @@ function CourseInfoTable() {
         setPageContent(0);
     };
 
-    const handleSearchInputChange = (event) => {
-        setSearchTerm(event.target.value);
-        setPageContent(1);
-      };
-
-    const fetchCourseData = () =>{
-        Axios
-          .get(`http://localhost:3001/api/allCoursesV1/?subject=all&language=all&sortBy=all&searchTerm=${searchTerm}`)
-          .then((res) => {
-            // setCourses(res.data);
-            setCourseData(res.data);
-            console.log(res.data); 
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-      
-      
-      useEffect(() => {
-        if(localStorage.getItem('userType')=='Admin'){
-            fetchCourseData();
-        }
-       
-      }, [searchTerm]);
-
     const [expandedRows, setExpandedRows] = useState({}); // State to manage expanded rows
+    const [expandedRowsForAnswrs, setExpandedRowsForAnswers] = useState({}); // State to manage expanded rows
 
     // Function to toggle the visibility of additional content for a row
     const toggleRowExpansion = (rowId) => {
@@ -105,6 +78,15 @@ function CourseInfoTable() {
       }));
       fetchContentForEachRow(rowId);
     };
+
+    const toggleRowExpansionForAnswers = (parentRowId, nestedRowId) => {
+        const combinedId = `${parentRowId}-${nestedRowId}`;
+        setExpandedRowsForAnswers((prevState) => ({
+            ...prevState,
+            [combinedId]: !prevState[combinedId] // Toggle the state for the clicked row
+        }));
+        fetchAnswerReportsForEachRow(nestedRowId);
+      };
 
     function onClickVerify(row) {
         Axios.put(`http://localhost:3001/api/verifyTeacher/${row.id}`)
@@ -143,34 +125,40 @@ function CourseInfoTable() {
     }
 
     function deleteCourseContent(contentId) {
-        const confirmed = window.confirm("Are you sure you want to delete this content?");
+        const confirmed = window.confirm("Are you sure you want to delete this answer?");
   
         // Check if the user confirmed the action
         if (confirmed) {
-            Axios.delete(`http://localhost:3001/api/deleteSubTopic/${contentId}`).then((response) => {
-                console.log("Nishaa Gopi");
+            Axios.delete(`http://localhost:3001/api/deleteAnswer/${contentId}`).then((response) => {
                 alert("Content Deleted successfully");
                 window.location.reload(false);
-              });
+              })
+              .catch((err) => {
+                if (err.response && err.response.status === 403) {
+                    window.alert(err.response.data);
+                } else {
+                    window.alert("An error occurred while deleting the doubt.");
+                }
+                console.log(err);
+            });
         }         
     }
 
-    function deleteCourse(courseId) {
-        const confirmed = window.confirm("Are you sure you want to delete this course?");
+    function deleteCourse(doubtId) {
+        const confirmed = window.confirm("Are you sure you want to delete this doubt?");
     
         // Check if the user confirmed the action
         if (confirmed) {
-            Axios.delete(`http://localhost:3001/api/deleteCourse/${courseId}`)
+            Axios.delete(`http://localhost:3001/api/deleteDoubt/${doubtId}`)
                 .then((response) => {
-                    console.log("Nishaa Gopi");
-                    window.alert("Course Deleted successfully");
+                    window.alert("Doubt Deleted successfully");
                     window.location.reload(false);
                 })
                 .catch((err) => {
                     if (err.response && err.response.status === 403) {
                         window.alert(err.response.data);
                     } else {
-                        window.alert("An error occurred while deleting the course.");
+                        window.alert("An error occurred while deleting the doubt.");
                     }
                     console.log(err);
                 });
@@ -188,28 +176,13 @@ function CourseInfoTable() {
 
     const fetchData = async () => {
         try {
-            if(localStorage.getItem('userType') == 'Teacher'){
-                Axios.get(`http://localhost:3001/api/allcoursesForTeacher/${localStorage.getItem('user_id')}`).then(
-                    (response) => {
-                        console.log(response.data);
-                        // setTeacherData(...teacherData, response.data);
-                        setCourseData(response.data);
-                    })
-                    .catch((err) => {
-                      console.log(err);
-                    });
-              }
-              else{
-                Axios.get("http://localhost:3001/api/allCourses").then(
+               Axios.get("http://localhost:3001/api/getAllGroupsDoubts").then(
                     (response) => {
                         console.log(response.data);
                         // setTeacherData(...teacherData, response.data);
                         setCourseData(response.data);
                     }
                 );
-              }
-
-
            
 
             // fetchContentData();
@@ -220,17 +193,7 @@ function CourseInfoTable() {
 
     const fetchContentData = async () => {
         try {
-            if(localStorage.getItem('userType') == 'Teacher'){
-                Axios.get(`http://localhost:3001/api/subTopicForTeacher/${localStorage.getItem('user_id')}`).then(
-                    (response) => {
-                        console.log(response.data);
-                        // setTeacherData(...teacherData, response.data);
-                        setCourseContentData(response.data);
-                    })
-                    .catch((err) => {
-                      console.log(err);
-                    });
-              }else{
+
                 Axios.get("http://localhost:3001/api/subTopic").then(
                     (response) => {
                         console.log(response.data);
@@ -241,7 +204,6 @@ function CourseInfoTable() {
                 .catch((err) => {
                     console.log(err);
                   });
-              }
            
 
             
@@ -251,10 +213,16 @@ function CourseInfoTable() {
     };
 
     const [courseContentRowData, setCourseContentRowData] = useState([]);
+    const [answerReportRowData, setAnswerReportRowData] = useState([]);
 
 
-      const fetchContentForEachRow = (courseId) => {
-        Axios.get(`http://localhost:3001/api/subTopicbyCourseId/${courseId}`).then(
+      const fetchContentForEachRow = (doubtId) => {
+        Axios.get("http://localhost:3001/api/getAllAnswersForDoubt",
+        {params:{
+            doubt_id:doubtId,
+            user_id: localStorage.getItem('user_id')
+          }}
+        ).then(
             (response) => {
                 console.log(response.data);
                 // setTeacherData(...teacherData, response.data);
@@ -264,7 +232,22 @@ function CourseInfoTable() {
         .catch((err) => {
             console.log(err);
           });
+        }
+
+
+        const fetchAnswerReportsForEachRow = (doubtId) => {
+            Axios.get(`http://localhost:3001/api/reportOrLikeDoubtForUser/${doubtId}`).then(
+                (response) => {
+                    console.log(response.data);
+                    // setTeacherData(...teacherData, response.data);
+                    setAnswerReportRowData(response.data);
+                }
+            )
+            .catch((err) => {
+                console.log(err);
+              });
     }
+
 
     const handleOpenAddCourseModal = () => {
         setOpen(true);
@@ -307,23 +290,10 @@ function CourseInfoTable() {
 
         <>
             <ToastContainer hideProgressBar={true} /> 
-        
+ 
         <div style={{float:" left", width: "98%"}}>
-        <div>
-        {localStorage.getItem('userType') != 'Teacher' && (
-                <TextField style={{ width: 700, marginTop: "20px", marginLeft:'210px' }}
-          label="Search By Course name, subject, language ..."
-          value={searchTerm}
-          onChange={handleSearchInputChange}
-        /> 
-                )}
-        </div>
-                <h2>Courses</h2></div>
-                
+                <h2>Doubts</h2></div> 
             <div style={{float: "left", width: "2%"}}>
-                
-            <div >
-        </div>
                 <Box
                     sx={{
                         display: "flex",
@@ -331,11 +301,10 @@ function CourseInfoTable() {
                         justifyContent: "flex-end",
                     }}
                 >
-                   
                     <Box sx={{ my: 2 }}>
-                        <Button style={{ width: "180px" }} onClick={handleOpenAddCourseModal} variant="contained" startIcon={<AddIcon />}>
+                        {/* <Button style={{ width: "180px" }} onClick={handleOpenAddCourseModal} variant="contained" startIcon={<AddIcon />}>
                             Add Course
-                        </Button>
+                        </Button> */}
                     </Box>
 
                     <Box>
@@ -350,15 +319,11 @@ function CourseInfoTable() {
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell><b>Title</b></TableCell>
+                            <TableCell><b>Topic</b></TableCell>
                             <TableCell><b>Description</b></TableCell>
-                            <TableCell ><b> Language</b></TableCell>
-                            <TableCell ><b> Course fee</b></TableCell>
-
-                            <TableCell ><b>Subject</b></TableCell>
-                            <TableCell ><b>Teacher</b></TableCell>
-                            <TableCell><b>Hours</b></TableCell>
-                            <TableCell ><b>Actions</b></TableCell>
+                            <TableCell ><b> Image</b></TableCell>
+                            <TableCell><b>Group Name</b></TableCell>
+                            <TableCell><b>Posted By</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -368,13 +333,17 @@ function CourseInfoTable() {
                                 key={row.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                <TableCell>{row.title}</TableCell>
+                                <TableCell>{row.topic}</TableCell>
                                 <TableCell >{row.description}</TableCell>
-                                <TableCell >{row.language}</TableCell>
-                                <TableCell >Rs.{row.amount}</TableCell>
-                                <TableCell >{row.subject}</TableCell>
-                                <TableCell >{row.name}</TableCell>
-                                <TableCell >{row.hours}</TableCell>
+                                <TableCell sx={{ width: '30%' }}>
+                                {(row.img_path == '' || row.img_path == null)  && (
+                                <span>No Image</span>
+                                 )}
+                                 {(row.img_path)  && (
+                                    <img src={row.img_path} controls className="image-preview" /> 
+                                 )}</TableCell>
+                                <TableCell >{row.groupName}</TableCell>
+                                <TableCell >{row.postedBy}</TableCell>
                                 <TableCell > <Stack direction="row" spacing={1}>
                                 <Tooltip title="Expand to view content">
                                 <IconButton aria-label="expand row" onClick={() => toggleRowExpansion(row.id)}>
@@ -382,9 +351,9 @@ function CourseInfoTable() {
                             </IconButton>
                             </Tooltip>
                                  
-                                        <IconButton aria-label="edit" onClick={() => handleOpenEditCourseModal(row)}>
+                                        {/* <IconButton aria-label="edit" onClick={() => handleOpenEditCourseModal(row)}>
                                             <EditIcon />
-                                        </IconButton>
+                                        </IconButton> */}
                              
                                     <Box style={{ position: "relative" }}>
                                     {/* <CreateTeacherModal setOpen={setOpen} open={open} /> */}
@@ -404,9 +373,9 @@ function CourseInfoTable() {
                             <Collapse in={expandedRows[row.id]} timeout="auto" unmountOnExit>
                                 {/* Your additional content for the row */}
                                 <Box style={{ float: "right",padding:'10px' }}>
-                                <Button style={{ width: "180px" }} onClick={() => handleOpenAddCourseContentModal(row.id)} variant="contained" startIcon={<AddIcon />}>
+                                {/* <Button style={{ width: "180px" }} onClick={() => handleOpenAddCourseContentModal(row.id)} variant="contained" startIcon={<AddIcon />}>
                             Add Content
-                        </Button>
+                        </Button> */}
                     </Box>
                                 <Box sx={{ margin: 1 }}>
                                 <Typography variant="body1" gutterBottom>
@@ -415,65 +384,94 @@ function CourseInfoTable() {
                         <Table>
                           <TableHead>
                             <TableRow>
-                              <TableCell sx={{ width: '20%' }}><b>Content Title</b></TableCell>
-                              <TableCell sx={{ width: '20%' }}><b>Content Description</b></TableCell>
-                              <TableCell sx={{ width: '40%' }}><b>Video</b></TableCell>
-                              <TableCell sx={{ width: '10%' }}><b>Document</b></TableCell>
+                              <TableCell sx={{ width: '20%' }}><b>Description</b></TableCell>
+                              <TableCell sx={{ width: '40%' }}><b>Image</b></TableCell>
+                              <TableCell sx={{ width: '10%' }}><b>Answered By</b></TableCell>
+                              <TableCell sx={{ width: '10%' }}><b>Liked By</b></TableCell>
                               <TableCell sx={{ width: '10%' }}><b>Actions</b></TableCell>
                             </TableRow>
                           </TableHead>
                           <TableBody>
                             {/* Render content for the selected row */}
                             {courseContentRowData.map((contentRow) => (
+                                <React.Fragment key={contentRow.id}>
                               <TableRow key={contentRow.id}>
-                                <TableCell>{contentRow.title}</TableCell>
+
                                 <TableCell>{contentRow.description}</TableCell>
                                 {/* <TableCell><video src={contentRow.file_path} controls className="image-preview" /></TableCell> */}
                                 
-                                <TableCell>
-        {contentRow.file_type === "video" && (
-            <video src={contentRow.file_path.split(",")[0]} controls className="image-preview" />
-        )}
-        {contentRow.file_type === "both" && (
-            // <>
-            <video src={contentRow.file_path.split(",")[0]} controls className="image-preview" />
-            // <a href={contentRow.file_path} target="_blank" rel="noopener noreferrer">
-            //     View Document
-            // </a>
-            // </>
-        )}
-        {contentRow.file_type === "document" && (
-            <span>No Video</span>
-        )}
-    </TableCell>
-    <TableCell>
-        {contentRow.file_type === "video" && (
-           <span>No Documents</span>
-        )}
-        {contentRow.file_type === "both" && (
+                                <TableCell> 
+                                {(contentRow.img_path == '' || contentRow.img_path == null)  && (
+                                <span>No Image</span>
+                                 )}
+                                 {(contentRow.img_path)  && (
+                                    <img src={contentRow.img_path} controls className="image-preview" /> 
+                                 )}
+                                 </TableCell>
+                                <TableCell>{contentRow.name}</TableCell>
+                                <TableCell>{contentRow.likeCount}</TableCell>
+                                
 
-            <a href={contentRow.file_path.split(",")[1]} target="_blank" rel="noopener noreferrer">
-                View Document
-            </a>
 
-        )}
-        {contentRow.file_type === "document" && (
-            <a href={contentRow.file_path} target="_blank" rel="noopener noreferrer">
-                View Document
-            </a>
-        )}
-    </TableCell>
 
                                 <TableCell > <Stack direction="row" spacing={1}>
+                                <Tooltip title="Expand to view content">
+                                <IconButton aria-label="expand row" onClick={() => toggleRowExpansionForAnswers(row.id,contentRow.id)}>
+                                {expandedRowsForAnswrs[`${row.id}-${contentRow.id}`] ? <ArrowUpIcon /> : <ArrowDownIcon />}
+                            </IconButton>
+                            </Tooltip>
 
-
-                                        <IconButton aria-label="edit" onClick={() => handleOpenEditCourseContentModal(contentRow)}>
+                                        {/* <IconButton aria-label="edit" onClick={() => handleOpenEditCourseContentModal(contentRow)}>
                                             <EditIcon />
                                         </IconButton>
-                                    
+                                     */}
                                     <Box style={{ position: "relative" }}>
                                     {/* <CreateTeacherModal setOpen={setOpen} open={open} /> */}
                                         {/* <EditTeacherModal setOpen={setOpen1} open={open1} data={row} /> */}
+                                    </Box>
+
+
+                                    <IconButton aria-label="delete" color="error" onClick={() => deleteCourseContent(contentRow.id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+
+                                </Stack>
+                                </TableCell>
+                              </TableRow>
+                              <TableRow>
+                            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                            {/* Collapse component to show/hide additional content */}
+                            <Collapse in={expandedRowsForAnswrs[`${row.id}-${contentRow.id}`]} timeout="auto" unmountOnExit>
+                                {/* Your additional content for the row */}
+                                <Box style={{ float: "right",padding:'10px' }}>
+                    </Box>
+                                <Box sx={{ margin: 1 }}>
+                                <Typography variant="body1" gutterBottom>
+                        {answerReportRowData.length != 0 ? (
+                        <TableContainer component={Paper}>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell sx={{ width: '20%' }}><b>Reason</b></TableCell>
+                              <TableCell sx={{ width: '40%' }}><b>Reported By</b></TableCell>
+                              <TableCell sx={{ width: '10%' }}><b>Actions</b></TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {/* Render content for the selected row */}
+                            {answerReportRowData.map((contentRow) => (
+                              <TableRow key={contentRow.id}>
+
+                                <TableCell>{contentRow.reason}</TableCell>
+                                {/* <TableCell><video src={contentRow.file_path} controls className="image-preview" /></TableCell> */}
+                                
+                                <TableCell>{contentRow.name}</TableCell>                               
+
+
+
+                                <TableCell > <Stack direction="row" spacing={1}>
+
+                                    <Box style={{ position: "relative" }}>
                                     </Box>
 
 
@@ -489,13 +487,30 @@ function CourseInfoTable() {
                         </Table>
                       </TableContainer>
                         ):(
-                            <p><strong><i>No content available for this course.</i></strong></p>
+                            <p><strong><i>No reports available for this answer.</i></strong></p>
                         )}
                       </Typography>
                                 </Box>
                             </Collapse>
                             </TableCell>
                         </TableRow>
+                              </React.Fragment>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                        ):(
+                            <p><strong><i>No answers available for this doubt.</i></strong></p>
+                        )}
+                      </Typography>
+                                </Box>
+                            </Collapse>
+                            </TableCell>
+                        </TableRow>
+
+                        
+        
+
                             </React.Fragment>
                         ))}
                     </TableBody>
@@ -523,4 +538,4 @@ function CourseInfoTable() {
     );
 }
 
-export default CourseInfoTable;
+export default DoubtsInfoTable;

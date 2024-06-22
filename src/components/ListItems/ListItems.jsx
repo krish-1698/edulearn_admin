@@ -13,7 +13,8 @@ import {
   AutoStories,
   AssignmentTurnedIn,
   Diversity3,
-  Assessment
+  Assessment,
+  QuestionAnswer
 } from "@mui/icons-material";
 import NavBarItem from "../../components/NavBarItem/NavBarItem";
 import { Link } from "react-router-dom";
@@ -68,6 +69,11 @@ export const adminListItems = (
         name: "Groups",
         icon: <Diversity3 />,
         link: "/groups",
+      },
+      {
+        name: "Doubts",
+        icon: <QuestionAnswer />,
+        link: "/doubts",
       },
       {
         name: "Reports",

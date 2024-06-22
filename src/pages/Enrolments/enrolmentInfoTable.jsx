@@ -1,8 +1,10 @@
 import { Box, Button } from "@mui/material";
 import React, { useState, useEffect } from "react";
 
-import { AddCircle as AddIcon, Create } from "@mui/icons-material";
+import { AddCircle as AddIcon, Create  } from "@mui/icons-material";
 import Table from "@mui/material/Table";
+import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
@@ -21,6 +23,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
 import CourseModal from "../../modal/CourseModal";
 import EnrolmentModal from "../../modal/enrolmentModal";
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 function createData(title, updated_date, description, action) {
     return { title, updated_date, description, action };
@@ -36,6 +40,64 @@ const courses = [
 function EnrolmentInfoTable() {
     let navigate = useNavigate();
 
+    // const [filteredData, setFilteredData] = useState(displayedData);
+    const [filters, setFilters] = useState({
+      title: '',
+      tname: '',
+      enroled_date: '',
+      sname: ''
+    });
+
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+
+    const filterData = () => {
+        let newFilteredData = displayedData;
+    
+        if (filters.title) {
+          newFilteredData = newFilteredData.filter(row => row.title.toLowerCase().includes(filters.title.toLowerCase()));
+        }
+        if (filters.tname) {
+          newFilteredData = newFilteredData.filter(row => row.tname.toLowerCase().includes(filters.tname.toLowerCase()));
+        }
+        if (filters.enroled_date) {
+          newFilteredData = newFilteredData.filter(row => row.enroled_date.includes(filters.enroled_date));
+        }
+        if (filters.sname) {
+          newFilteredData = newFilteredData.filter(row => row.sname.toLowerCase().includes(filters.sname.toLowerCase()));
+        }
+    
+        if (sortConfig.key) {
+          newFilteredData.sort((a, b) => {
+            if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+          });
+        }
+    
+        // setFilteredData(newFilteredData);
+      };
+    
+      const handleFilterChange = (event) => {
+        const { name, value } = event.target;
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          [name]: value
+        }));
+      };
+    
+      const handleSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+          direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+      };
+    
+      const getSortIcon = (key) => {
+        if (sortConfig.key !== key) return null;
+        if (sortConfig.direction === 'asc') return <ArrowUpwardIcon fontSize="small" />;
+        return <ArrowDownwardIcon fontSize="small" />;
+      };
     const [enrolmentData, setEnrolmentData] = useState([]);
     const [courseContentData, setCourseContentData] = useState([]);
 
@@ -99,15 +161,16 @@ function EnrolmentInfoTable() {
         navigate("/freelancerpayment/new", { replace: true });
     }
 
-    function deletefreelancer(freelancerid) {
-        // Axios.post("http://localhost:3001/api/deletefreelancer", {
-
-        //   freelancerid:freelancerid
-        // }).then((response) => {
-        //   console.log("Nishaa Gopi");
-        //   // alert(response.data.message);
-        //   window.location.reload(false);
-        // });
+    function deleteEnrolment(enrolmentId) {
+        const confirmed = window.confirm("Are you sure you want to delete this enrolement?");
+  
+        // Check if the user confirmed the action
+        if (confirmed) {
+        Axios.post(`http://localhost:3001/api/deleteEnrolment/${enrolmentId}`).then((response) => {
+          alert("Enrolment deleted sucessfully");
+          window.location.reload(false);
+        });
+        }
     }
 
     const startIndex = page * rowsPerPage;
@@ -231,6 +294,22 @@ function EnrolmentInfoTable() {
                     <TableHead>
                         <TableRow>
                             <TableCell><b>Course Name</b></TableCell>
+{/* 
+                            <Box display="flex" alignItems="center">
+                  <TextField
+                    label="Course Name"
+                    variant="standard"
+                    name="title"
+                    value={filters.title}
+                    onChange={handleFilterChange}
+                    fullWidth
+                  />
+                  <Tooltip title="Sort by Course Name">
+                    <IconButton onClick={() => handleSort('title')}>
+                      {getSortIcon('title')}
+                    </IconButton>
+                  </Tooltip>
+                </Box> */}
                             <TableCell><b>Teacher Name</b></TableCell>
                             <TableCell><b>Enroled Date</b></TableCell>
                             <TableCell><b>Student Name</b></TableCell>
@@ -265,7 +344,7 @@ function EnrolmentInfoTable() {
                                     </Box>
 
 
-                                    <IconButton aria-label="delete" color="error" onClick={() => deletefreelancer(row.freelancerid)}>
+                                    <IconButton aria-label="delete" color="error" onClick={() => deleteEnrolment(row.id)}>
                                         <DeleteIcon />
                                     </IconButton>
 

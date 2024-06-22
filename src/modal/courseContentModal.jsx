@@ -7,7 +7,8 @@ import {
     TextField,
     Typography,
     Autocomplete,
-    Container
+    Container,
+    FormControl, FormLabel, RadioGroup, FormControlLabel, Radio 
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import IconButton from "@mui/material/IconButton";
@@ -45,19 +46,70 @@ function CourseContentModal({ open, setOpen, courseToEdit,courseId }) {
     const [image, setImage] = useState('');
     const [video, setVideo] = useState('');
     const [courseData, setAllCourseData] = useState([]);
+    const [document, setDocument] = useState(null);
+    const [uploadChoice, setUploadChoice] = useState('both');
 
     const handleVideoUpload = (error, result, widget) => {
-        debugger;
         if ( error ) {
           widget.close({
             quiet: true
           });
           return;
         }
-        setVideo(result?.info?.secure_url);
+        if(result?.info?.resource_type == 'video'){
+            setVideo(result?.info?.secure_url);
+            console.log("asdfg");
+        }
+        else{
+            setDocument(result?.info?.secure_url);
+            console.log("yres");
+        }
+        
         console.log(result);
         console.log(video,"xnnnxn");
       }
+
+      const handleDocumentUpload = (error, result, widget) => {
+
+        if ( error ) {
+          widget.close({
+            quiet: true
+          });
+          return;
+        }
+        setDocument(result?.info?.secure_url);
+        console.log(result);
+        console.log(document,"xnnnxn");
+      }
+
+    //   const handleUpload = (error, result, widget, identifier) => {
+    //     console.log("printing");
+    //     if (error) {
+    //         widget.close({
+    //             quiet: true
+    //           });
+    //       console.error("Upload error:", error);
+    //       return;
+    //     }
+    
+    //     if (result?.event === 'success') {
+    //       const uploadedFileUrl = result?.info?.secure_url;
+    //         console.log(uploadedFileUrl);
+    //       if (identifier === 'video') {
+    //         if (result?.info?.resource_type === 'video') {
+    //           setVideo(uploadedFileUrl);
+    //         } else {
+    //           alert('Please upload a valid video file.');
+    //         }
+    //       } else if (identifier === 'document') {
+    //         if (['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(result?.info?.format)) {
+    //           setDocument(uploadedFileUrl);
+    //         } else {
+    //           alert('Please upload a valid document file (PDF or Word).');
+    //         }
+    //       }
+    //     }
+    //   };
 
       useEffect(() => {
         // const uniqueTeacherNames = [...new Set(allTeacherData.map(item => item.name))];
@@ -89,7 +141,16 @@ function CourseContentModal({ open, setOpen, courseToEdit,courseId }) {
 
 
     const editStudent = () => {
-
+        let filePath;
+        if(uploadChoice == 'both'){
+            filePath = `${video},${document}`;
+        }
+        else if(uploadChoice == 'video'){
+            filePath = video;
+        }
+        else{
+            filePath = document;
+        }
         console.log(course);
        const formData = new FormData();
         console.log(courseToEdit);
@@ -99,7 +160,9 @@ function CourseContentModal({ open, setOpen, courseToEdit,courseId }) {
                 course_id: courseId,
                 title: title,
                 description: description,
-                file_path: video
+                // file_path: video,
+                file_path: filePath,
+                file_type: uploadChoice
               };
     console.log(formData);  
     console.log(data1);
@@ -128,8 +191,10 @@ function CourseContentModal({ open, setOpen, courseToEdit,courseId }) {
                 // course_id: course.id,
                 title: title,
                 description: description,
-                file_path: video,
-                subtopic_id: courseToEdit.id
+                // file_path: video,
+                subtopic_id: courseToEdit.id,
+                file_path: filePath,
+                file_type: uploadChoice
       };
       console.log(data1);
     axios
@@ -158,38 +223,19 @@ function CourseContentModal({ open, setOpen, courseToEdit,courseId }) {
     }
 
  
-    const subjects = [
-        '',
-         'Physics',
-    'Chemistry' ,
-     'Biology' ,
-    ]
 
-
-    const languages = [
-        '',
-         'English' ,
-         'Tamil' ,
-         'Sinhala'
-    ]
-
-    const types = [
-        '',
-         'Normal' ,
-         'Premium'
-    ]
-
-    const states = [
-        '',
-         'Paid' ,
-         'Unpaid' 
-    ]
     // const [open, setOpen] = useState();
     // const modalOpen = () => setOpen(true);
     // const modalOpen = () => setOpen();
 
     function handleClose() {
         setOpen(false);
+        setCourse( "")
+            setTitle("");
+            setDescription( "");
+            setVideo("");
+            setUploadChoice('both');
+            setDocument("")
     }
 
 
@@ -199,7 +245,21 @@ function CourseContentModal({ open, setOpen, courseToEdit,courseId }) {
             setCourse({id: courseToEdit.course_id, name: courseToEdit.title} || "")
             setTitle(courseToEdit.title || "");
             setDescription(courseToEdit.description || "");
-            setVideo(courseToEdit.file_path || "");
+            setUploadChoice(courseToEdit.file_type || "");
+            if(courseToEdit.file_type == 'video'){
+                setVideo(courseToEdit.file_path || "");
+            }
+            else if(courseToEdit.file_type == 'document'){
+                setDocument(courseToEdit.file_path || "");
+            }
+            else if(courseToEdit.file_type == 'both'){
+                let paths =  courseToEdit.file_path.split(",");
+                setVideo(paths[0]);
+                setDocument(paths[1]);
+            }
+            else{
+
+            }
             // setDescription(courseToEdit.description || "");
             
           }else{
@@ -215,6 +275,7 @@ function CourseContentModal({ open, setOpen, courseToEdit,courseId }) {
             setState("");
             setImage("");
             setVideo("");
+            setDocument("");
           }
          
     }, [courseToEdit]);
@@ -290,7 +351,22 @@ function CourseContentModal({ open, setOpen, courseToEdit,courseId }) {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         ></TextField>
-
+                         <FormControl component="fieldset" sx={{ mt: 2 }}>
+                        <FormLabel component="legend">What would you like to upload?</FormLabel>
+                        <RadioGroup
+                        row
+                        aria-label="upload-choice"
+                        name="upload-choice"
+                        value={uploadChoice}
+                        onChange={(e) => setUploadChoice(e.target.value)}
+                        >
+                        <FormControlLabel value="video" control={<Radio />} label="Only Video" />
+                        <FormControlLabel value="document" control={<Radio />} label="Only Document" />
+                        <FormControlLabel value="both" control={<Radio />} label="Both" />
+                        </RadioGroup>
+                       </FormControl>
+                       {uploadChoice !== 'document' && (
+                        <>
                          <Typography pl={1} pt={1}>
                             Video
                             </Typography>
@@ -318,7 +394,7 @@ function CourseContentModal({ open, setOpen, courseToEdit,courseId }) {
             </div>
                 )} */}
                             {/* Updated ImageUploadWidget for video uploads */}
-                            <ImageUploadWidget onUpload={handleVideoUpload}>
+                            <ImageUploadWidget onUpload={handleVideoUpload} identifier="first">
                             {({ open }) => {
                                 function handleOnClick(e) {
                                 e.preventDefault();
@@ -332,8 +408,35 @@ function CourseContentModal({ open, setOpen, courseToEdit,courseId }) {
                                 );
                             }}
                             </ImageUploadWidget>
-           
+                            </>
+                       )}
              
+                        {uploadChoice !== 'video' && (
+                            <>
+                            <Typography pl={1} pt={1}>
+                                Document (Word/PDF)
+                            </Typography>
+                            {document && (
+                                <a href={document} target="_blank" rel="noopener noreferrer">
+                                View Document
+                                </a>
+                            )}
+                            <ImageUploadWidget onUpload={handleVideoUpload}>
+                                {({ open }) => {
+                                function handleOnClick(e) {
+                                    e.preventDefault();
+                                    open();
+                                }
+                                return (
+                                    <button onClick={handleOnClick} id="upload-button">
+                                    <UploadIcon />
+                                    Upload Document
+                                    </button>
+                                );
+                                }}
+                            </ImageUploadWidget>
+                            </>
+                        )}
                      
                         <Box
                             sx={{

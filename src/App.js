@@ -11,6 +11,7 @@ import Advertisements from "./pages/Advertsiements/advertisments";
 import Enrolments from "./pages/Enrolments/enrolments";
 import Groups from "./pages/Groups/groups";
 import Reports from "./pages/Reports/reports";
+import Doubts from "./pages/Doubts/Doubts";
 
 const App = () => {
 
@@ -31,6 +32,7 @@ const App = () => {
           <Route path="/enrolments" element={<Enrolments userType={userType}/>} />
           <Route path="/groups" element={<Groups userType={userType}/>} />
           <Route path="/reports" element={<Reports userType={userType}/>} />
+          <Route path="/doubts" element={<Doubts userType={userType}/>} />
           {/* Add more routes for other components/pages */}
         </Routes>
       </div>

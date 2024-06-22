@@ -67,10 +67,17 @@ function StudentModal({ open, setOpen, studentToEdit }) {
                 // setCourses(res.data);
                 // setName(res.data);
                 console.log(res.data);
-                handleClose();
-                window.alert("Student added successfully")
-                navigate('/students')
-                window.location.reload(false);
+                if (res.data && res.data.msg) {
+                    alert(res.data.msg);
+                  } else if (res.data && res.data.email) {
+                    handleClose();
+                    window.alert("Student added successfully")
+                    navigate('/students')
+                    window.location.reload(false);
+                  } else {
+                    alert("Unexpected response from the server.");
+                  }
+               
             })
             .catch((err) => {
                 console.log(err);
@@ -98,6 +105,15 @@ function StudentModal({ open, setOpen, studentToEdit }) {
     })
     .catch((err) => {
         console.log(err);
+        if (err.response) {
+            if (err.response.status === 400) {
+                alert(err.response.data);
+            }else {
+                 alert("An error occurred while updating user."); // Generic error message
+            }
+            } else {
+                 alert("Network error or server is unreachable. Please try again later.");
+            }
     });
 }
         
@@ -120,6 +136,10 @@ function StudentModal({ open, setOpen, studentToEdit }) {
 
     function handleClose() {
         setOpen(false);
+        setName("");
+        setUsername("");          
+        setPassword("");
+        setEmail("");
     }
 
 
@@ -195,7 +215,7 @@ function StudentModal({ open, setOpen, studentToEdit }) {
                         </Typography>
                         <TextField
                             sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                            placeholder="Qualification"
+                            placeholder="Email"
                             size="small"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}

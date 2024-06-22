@@ -77,21 +77,6 @@ function AdvertisementInfoTable() {
        
       
 
-    function onClick2(row) {
-        localStorage.setItem('data', JSON.stringify(row));
-
-        navigate("/freelancers/update", { replace: true });
-    }
-
-    function onClick3() {
-        navigate("/freelancerpayment", { replace: true });
-    }
-
-    function onClick4(data) {
-        localStorage.setItem('data', JSON.stringify(data))
-        navigate("/freelancerpayment/new", { replace: true });
-    }
-    
     function onClickVerify(row) {
         Axios.put(`http://localhost:3001/api/verifyAd/${row.id}`)
             .then((response) => {

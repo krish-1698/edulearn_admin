@@ -56,10 +56,58 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
         setSelectedFile(file);
     }
 
+    const [formErrors, setFormErrors] = useState({});
+
+    const validate = () => {
+      const errors = {};
+    if (!name) {
+      errors.name = 'Name is required';
+    }
+  
+    if (!subject) {
+      errors.subject = 'Subject is required';
+    }
+  
+    if (!language) {
+      errors.language = 'Language is required';
+    }
+  
+    if (!description) {
+        errors.description = 'Description is required';
+      }
+      if (!city) {
+        errors.city = 'City is required';
+      }
+
+      if (!type) {
+        errors.type = 'Type is required';
+      }
+
+      if (!type) {
+        errors.state = 'State is required';
+      }
+
+      if (!mobileNo) {
+        errors.mobileNo = 'Mobile Number is required';
+      } else if (!/^[0-9]{10}$/.test(mobileNo)) {
+        errors.mobileNo = 'Mobile Number must be 10 digits';
+      }
+  
+    if (!email) {
+      errors.email = 'Email Address is required';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = 'Email Address is invalid';
+    }
+  
+    return errors;
+  };
+  
 
     const editStudent = () => {
 
-        
+    const errors = validate();
+    setFormErrors(errors);
+    if (Object.keys(errors).length === 0) {
        const formData = new FormData();
         console.log(advertisementToEdit);
         if(advertisementToEdit == null){
@@ -107,7 +155,8 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
          description: description,
          state:state,
          img_path:image,
-        id: advertisementToEdit.id
+        id: advertisementToEdit.id,
+        date_paid:advertisementToEdit.date_paid
       };
       console.log(data1);
     axios
@@ -128,7 +177,7 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
     });
 }
         
-       
+    }   
        
     }
 
@@ -165,6 +214,16 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
 
     function handleClose() {
         setOpen(false);
+        setCity("");
+        setDescription("");
+        setLanguage("");
+        setEmail("");
+        setImage("");
+        setMobileNo("");
+        setType("");
+        setSubject("");
+        setState("");
+        setFormErrors("");
     }
 
 
@@ -237,6 +296,8 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
                             placeholder="Name"
                             size="small"
                             value={name}
+                            error={formErrors.name}
+                            helperText={formErrors.name}
                             onChange={(e) => setName(e.target.value)}
                         ></TextField>
 
@@ -249,8 +310,11 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
                             options={subjects}
                             value={subject || ''}
                             sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
+                            error={Boolean(formErrors.subject)}
+                            helperText={formErrors.subject}
                             renderInput={(params) => <TextField {...params} placeholder="Select Subject" />}
                         />
+                        {formErrors.subject && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.subject}</Typography>}
                          <Typography pl={1} pt={1}>
                             Language
                         </Typography>
@@ -260,8 +324,11 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
                             options={languages}
                             value={language || ''}
                             sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
+                            error={Boolean(formErrors.language)}
+                            helperText={formErrors.language}
                             renderInput={(params) => <TextField {...params} placeholder="Select Language" />}
                         />
+                        {formErrors.language && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.language}</Typography>}
                          <Typography pl={1} pt={1}>
                             Type
                         </Typography>
@@ -271,9 +338,11 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
                             options={types}
                             value={type || ''}
                             sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
+                            error={Boolean(formErrors.type)}
+                            helperText={formErrors.type}
                             renderInput={(params) => <TextField {...params} placeholder="Select Type" />}
                         />
-
+                        {formErrors.type && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.type}</Typography>}
                         <Typography pl={1} pt={1}>
                             City
                         </Typography>
@@ -283,9 +352,11 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
                             placeholder="City"
                             size="small"
                             value={city}
+                            // error={Boolean(formErrors.city)}
+                            // helperText={formErrors.city}
                             onChange={(e) => setCity(e.target.value)}
                         ></TextField>
-
+                        {formErrors.city && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.city}</Typography>}
                         <Typography pl={1} pt={1}>
                             Description
                         </Typography>
@@ -296,6 +367,8 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
                             placeholder="Description"
                             size="small"
                             value={description}
+                            error={formErrors.description}
+                            helperText={formErrors.description}
                             onChange={(e) => setDescription(e.target.value)}
                         ></TextField>
 
@@ -307,6 +380,8 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
                             placeholder="email"
                             size="small"
                             value={email}
+                            error={formErrors.email}
+                            helperText={formErrors.email}
                             onChange={(e) => setEmail(e.target.value)}
                         ></TextField>
 
@@ -318,6 +393,8 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
                             placeholder="mobileNo"
                             size="small"
                             value={mobileNo}
+                            error={formErrors.mobileNo}
+                            helperText={formErrors.mobileNo}
                             onChange={(e) => setMobileNo(e.target.value)}
                         ></TextField>
                          <Typography pl={1} pt={1}>
@@ -328,14 +405,17 @@ function AdvertisementModal({ open, setOpen, advertisementToEdit }) {
                             disablePortal
                             options={states}
                             value={state || ''}
+                            error={Boolean(formErrors.state)}
+                            helperText={formErrors.state}
                             sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
                             renderInput={(params) => <TextField {...params} placeholder="Select state" />}
                         />
+                        {formErrors.state && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.state}</Typography>}
                          <Typography pl={1} pt={1}>
                             Image
                             </Typography>
                           {image && <img src={image} alt="menu item" className="image-preview"/>}
-            <ImageUploadWidget onUpload={handleOnUpload}>
+            <ImageUploadWidget onUpload={handleOnUpload} identifier="second">
           {({ open }) => {
             function handleOnClick(e) {
               e.preventDefault();

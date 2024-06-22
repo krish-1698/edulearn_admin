@@ -44,8 +44,52 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
         setSelectedFile(file);
     }
 
+    const [formErrors, setFormErrors] = useState({});
+
+    const validate = () => {
+      const errors = {};
+    if (!name) {
+      errors.name = 'Name is required';
+    }
+  
+    if (!subject) {
+      errors.subject = 'Subject is required';
+    }
+    if (!password) {
+        errors.password = 'Password is required';
+      }
+   
+    if (!nic) {
+        errors.nic = 'NIC is required';
+      }
+      if (!city) {
+        errors.city = 'City is required';
+      }
+
+      if (!qualification) {
+        errors.qualification = 'Qualification is required';
+      }
+
+      if (!mobile_no) {
+        errors.mobile_no = 'Mobile Number is required';
+      } else if (!/^[0-9]{10}$/.test(mobile_no)) {
+        errors.mobile_no = 'Mobile Number must be 10 digits';
+      }
+  
+    if (!email) {
+      errors.email = 'Email Address is required';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = 'Email Address is invalid';
+    }
+  
+    return errors;
+  };
+  
 
     const editTeacher = () => {
+        const errors = validate();
+    setFormErrors(errors);
+    if (Object.keys(errors).length === 0) {
        const formData = new FormData();
         
         formData.append("city", city);
@@ -85,6 +129,15 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
             })
             .catch((err) => {
                 console.log(err);
+                if (err.response) {
+                    if (err.response.status === 400) {
+                        alert(err.response.data);
+                    }else {
+                         alert("An error occurred while updating user."); 
+                    }
+                } else {
+                       alert("Network error or server is unreachable. Please try again later.");
+                }
             });
         }
         else{
@@ -117,13 +170,49 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
               })
               .catch((err) => {
                   console.log(err);
+                  if (err.response) {
+                    if (err.response.status === 400) {
+                        alert(err.response.data);
+                    }else {
+                         alert("An error occurred while updating user."); 
+                    }
+                } else {
+                       alert("Network error or server is unreachable. Please try again later.");
+                }
               });
         }
+    }
     }
 
 
 
-
+    const allDistricts = [
+        "Ampara",
+        "Anuradhapura",
+        "Badulla",
+        "Batticaloa",
+        "Colombo",
+        "Galle",
+        "Gampaha",
+        "Hambantota",
+        "Jaffna",
+        "Kalutara",
+        "Kandy",
+        "Kegalle",
+        "Kilinochchi",
+        "Kurunegala",
+        "Mannar",
+        "Matale",
+        "Matara",
+        "Monaragala",
+        "Mullaitivu",
+        "Nuwara Eliya",
+        "Polonnaruwa",
+        "Puttalam",
+        "Ratnapura",
+        "Trincomalee",
+        "Vavuniya"
+      ];
 
     const subjects = ['', 'Physics', 'Chemistry', 'Biology'];
     // const [open, setOpen] = useState();
@@ -132,6 +221,15 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
 
     function handleClose() {
         setOpen(false);
+        setName("");
+          setCity("");
+          setNic("");
+          setMobileNo("");
+          setSubject("");
+          setQualification("");
+          setPassword("");
+          setEmail("");
+          setState("ACTIVE");
     }
     useEffect(() => {
         // If teacherToEdit is provided, set the state with the teacher's details
@@ -201,6 +299,8 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
                             placeholder="Name"
                             size="small"
                             value={name}
+                            error={formErrors.name}
+                            helperText={formErrors.name}
                             onChange={(e) => setName(e.target.value)}
                         ></TextField>
 
@@ -215,9 +315,9 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
                         sx={{ paddingLeft: '10px', mt: '0.5rem', width: '95%' }}
                         renderInput={(params) => <TextField {...params} placeholder="Select Subject" />}
                         />
+                        {formErrors.subject && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.subject}</Typography>}
 
-
-                        <Typography pl={1} pt={1}>
+                        {/* <Typography pl={1} pt={1}>
                             City
                         </Typography>
                         <TextField
@@ -227,19 +327,20 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
                             size="small"
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
-                        ></TextField>
+                        ></TextField> */}
 
-                        {/* <Typography pl={1} pt={1}>
-                Amount
-              </Typography>
-              <TextField
-                multiline
-                maxRows={4}
-                sx={{ paddingLeft: "10px", mt: "0.5rem", width: "95%" }}
-                placeholder="Amount"
-                size="small"
-                onChange={handleOnChangeAmount}
-              ></TextField> */}
+                        <Typography pl={1} pt={1}>
+                        City
+                        </Typography>
+                        <Autocomplete
+                        onChange={(e, newValue) => setCity(newValue)}
+                        disablePortal
+                        options={allDistricts}
+                        value={city || ''}
+                        sx={{ paddingLeft: '10px', mt: '0.5rem', width: '95%' }}
+                        renderInput={(params) => <TextField {...params} placeholder="Select City" />}
+                        />
+                        {formErrors.city && <Typography variant="body2" color="error" sx={{ fontSize: "0.75rem", mt: 0.5, ml: 3,mr:3 }}>{formErrors.city}</Typography>}
 
                         <Typography pl={1} pt={1}>
                             NIC
@@ -251,6 +352,8 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
                             placeholder="NIC"
                             size="small"
                             value={nic}
+                            error={formErrors.nic}
+                            helperText={formErrors.nic}
                             onChange={(e) => setNic(e.target.value)}
                         ></TextField>
 
@@ -262,6 +365,8 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
                             placeholder="Mobile Number"
                             size="small"
                             value={mobile_no}
+                            error={formErrors.mobile_no}
+                            helperText={formErrors.mobile_no}
                             onChange={(e) => setMobileNo(e.target.value)}
                         ></TextField>
 
@@ -274,6 +379,8 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
                             placeholder="Qualification"
                             size="small"
                             value={qualification}
+                            error={formErrors.qualification}
+                            helperText={formErrors.qualification}
                             onChange={(e) => setQualification(e.target.value)}
                         ></TextField>
 
@@ -285,6 +392,8 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
                             placeholder="Email"
                             size="small"
                             value={email}
+                            error={formErrors.email}
+                            helperText={formErrors.email}
                             onChange={(e) => setEmail(e.target.value)}
                         ></TextField>
 
@@ -297,6 +406,8 @@ function TeacherModal({ open, setOpen, teacherToEdit }) {
                             placeholder="Password"
                             size="small"
                             value={password}
+                            error={formErrors.password}
+                            helperText={formErrors.password}
                             onChange={(e) => setPassword(e.target.value)}
                         ></TextField>
 
