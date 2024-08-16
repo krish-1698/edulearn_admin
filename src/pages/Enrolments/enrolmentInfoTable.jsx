@@ -166,7 +166,7 @@ function EnrolmentInfoTable() {
   
         // Check if the user confirmed the action
         if (confirmed) {
-        Axios.post(`http://localhost:3001/api/deleteEnrolment/${enrolmentId}`).then((response) => {
+        Axios.delete(`http://localhost:3001/api/deleteEnrolment/${enrolmentId}`).then((response) => {
           alert("Enrolment deleted sucessfully");
           window.location.reload(false);
         });
